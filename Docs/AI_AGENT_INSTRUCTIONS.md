@@ -1,320 +1,264 @@
-# 🤖 AI Agent System Instructions — Stray Swarm Project
+# 🤖 AI AGENT MASTER INSTRUCTIONS — Stray Swarm
 
-> **Purpose:** This document defines how the AI assistant should behave, guide, and communicate throughout the entire Stray Swarm development process. It ensures consistent, beginner-friendly, up-to-date guidance from pre-production to publishing.
-
----
-
-## 1. Context & Role
-
-### Who You Are
-You are acting as a **complete game development team** for a solo beginner developer building "Stray Swarm" — a hypercasual mobile puzzle-flow game in Unity 6 (2D URP). You fill every role:
-
-| Role | Responsibilities |
-|---|---|
-| **Lead Game Designer** | Mechanics, balancing, game feel, player experience |
-| **Lead Programmer** | Architecture, code quality, performance, debugging |
-| **Technical Artist** | Sprite specs, shaders, URP 2D lighting, particle systems |
-| **Audio Designer** | SFX design, music direction, audio implementation |
-| **UI/UX Designer** | Interface design, user flows, accessibility |
-| **QA Lead** | Testing strategy, bug tracking, device testing |
-| **Producer** | Scope management, task tracking, milestone planning |
-| **Publishing Specialist** | Store listing, ASO, compliance, launch strategy |
-
-### Who The User Is
-- A **beginner** with enthusiasm but limited Unity/C# experience
-- Learns best through **step-by-step guidance with explanations**
-- Uses **Unity 6** (latest, 6000.x), **Blender** for 3D→2D asset creation, and the **Unity Asset Store**
-- Works on **Windows**
-- Needs to be told **what to do, how to do it, and why**
+> **CRITICAL: Any AI agent working on this project MUST read this file in its entirety before writing a single line of code or giving any instructions to the user.**
 
 ---
 
-## 2. Communication Guidelines
+## 1. Project Identity
 
-### Always Do
-- ✅ **Explain the "why"** behind every decision, not just the "what"
-- ✅ **Use step-by-step numbered instructions** for any Unity Editor or code task
-- ✅ **Specify exact menu paths** (e.g., `Edit → Project Settings → Player → Other Settings`)
-- ✅ **Specify exact file paths** relative to the project (e.g., `Assets/_StraySwarm/Scripts/Core/`)
-- ✅ **Show complete code files** when creating new scripts — never just snippets without context
-- ✅ **Highlight what's new/changed** when modifying existing code (use diff format or callouts)
-- ✅ **Warn about common mistakes** before the user encounters them
-- ✅ **Provide checkpoint verification** — after each step, tell them what they should see/expect
-- ✅ **Reference the project documentation** — link to the appropriate doc when relevant
-- ✅ **Use beginner-friendly language** — avoid jargon without explanation
-- ✅ **Celebrate progress** — acknowledge milestones and wins
+| Field | Value |
+| :--- | :--- |
+| **Game Title** | Stray Swarm |
+| **Engine** | Unity 6 (6000.x) — 2D URP |
+| **Platform** | Android (Google Play) + iOS (App Store) |
+| **Genre** | Hypercasual / Puzzle-Flow |
+| **Art Pipeline** | Kawaii Cube Aesthetic — AI-generated cube character PNGs + code-driven wobble animations (no sprite sheets) |
+| **Target** | 60 FPS on mid-range mobile, Portrait (1080×1920), <80MB APK |
 
-### Never Do
-- ❌ **Never assume prior knowledge** — explain concepts as if it's the first time
-- ❌ **Never use deprecated APIs** — always use Unity 6 current systems (see Section 4)
-- ❌ **Never skip error handling** — always include try/catch, null checks, etc.
-- ❌ **Never give partial code** without showing where it goes in the file
-- ❌ **Never say "just do X"** — always show how
-- ❌ **Never ignore performance** — every implementation should consider mobile constraints
-- ❌ **Never break modularity** — all systems must remain decoupled via events/interfaces
+## 2. Game Concept
 
-### Communication Format
-When giving instructions, use this format:
+Swipe to navigate a stray cat through themed mazes (Desert, Forest, Winter, City), collect colorful lost animals into a conga-line tail, and deliver them to matching rescue stations before time runs out. Earn 1–3 stars based on speed. Progress through 50+ levels across 4 themed worlds.
 
-```
-### Step X: [Brief Title]
+## 2b. Reference Design (TARGET QUALITY)
 
-**What:** [One sentence describing what we're doing]
-**Why:** [One sentence explaining why this matters]
+The user provided reference screenshots from a similar production game. Key design targets:
 
-1. [Step-by-step instruction]
-2. [Step-by-step instruction]
-   - [Sub-detail if needed]
-3. [Step-by-step instruction]
+| Feature | Description |
+| :--- | :--- |
+| **Multiple simultaneous delivery stations** | 2–4 stations visible per level (at screen top), each accepting a different color. Stations are wooden crate/shelter style, NOT driving vans. |
+| **Themed world backgrounds** | Desert (warm sand), Forest (vibrant green), Winter (icy blue), City (gray). Each world has unique edge decorations. |
+| **Rounded path corners** | Paths use 47-tile Rule Tile set with smooth inner corners, NOT sharp 90° grid squares. |
+| **Small dense items** | Collectible animals are small (~0.4 tile size), densely placed along paths. |
+| **One-way arrow tiles** | Yellow circular arrows force the player in a specific direction. |
+| **Rock/stone obstacles** | Permanent or breakable barriers blocking path segments. |
+| **Numbered barriers** | Walls with a number that decrements each time player passes, breaking at 0. |
+| **Bridges/overpasses** | Paths that cross over each other on different layers. |
+| **Drop shadows** | Every object has a soft drop shadow on the path. |
+| **Thick playful font** | White text with purple stroke/outline, very bubbly (TextMeshPro outline). |
+| **Kawaii Cube Characters** | Player cat and all animals are soft rounded-square 'cube' characters. NO traditional sprite sheet animations. All motion via code-driven wobble physics (squash, stretch, hop, tilt). Animals in the tail ride inside small wooden baskets with their cube heads peeking out. |
 
-**✅ Checkpoint:** [What the user should see/verify after completing this step]
-```
+## 2c. Cube Aesthetic Art Direction (CRITICAL)
 
----
+The game uses a **"Kawaii Cube World"** visual identity. Key rules:
 
-## 3. Technical Standards
+1. **Characters:** Player cat and all 6 animal types are soft rounded-square 'cube' sprites. Single static PNG per character (no directional sprites). Eyes shift in movement direction via code.
+2. **Basket Tail System:** When collected, animals hop into small wooden baskets. The conga-line tail is a chain of bouncing baskets with cube animal heads peeking out from the top rim.
+3. **NO Sprite Sheet Animations:** All character life comes from code-driven transform manipulation:
+   - `CubeWobble.cs`: Idle sine-wave bob, move hop (squash & stretch), turn tilt, land squash.
+   - `BasketBounce.cs`: Follow lag, cargo sway, collect pop.
+   - `StationPulse.cs`: Idle breathing, attention glow, receive gulp.
+4. **Particles Use Square Shapes:** All particle effects use small rounded-square shapes (not circles) to match the cube aesthetic.
+5. **Delivery Stations:** Wooden crate/shelter style (matching the baskets). Collected animals visually stack up inside.
+6. **Obstacles:** All obstacles use rounded-rectangle/cube shapes (rounded rock cubes, rounded stone walls, yellow square arrows).
+7. **Visual Consistency Rule:** Before adding ANY visual element, verify: Is it rounded? Does it have a drop shadow? Does it wobble/bounce on interaction? Are particles square-shaped?
 
-### Code Quality
-- **Naming:** PascalCase for classes/methods/properties, camelCase for local variables, _camelCase for private fields
-- **Comments:** XML documentation on all public methods. Inline comments for non-obvious logic only
-- **File Organization:** One class per file. File name matches class name
-- **Access Modifiers:** Use `[SerializeField] private` instead of `public` for Inspector fields
-- **Constants:** Use `static readonly` or `const` in a `Constants.cs` file. Never hardcode magic numbers
-- **Null Safety:** Always null-check GetComponent results. Use TryGetComponent where possible
-
-### Architecture Principles
-- **ScriptableObject Events** for cross-system communication (no direct manager references)
-- **Composition over Inheritance** — use components, not deep class hierarchies
-- **Interface-Driven Design** — use interfaces (IInputProvider, IAudioPlayer) for testability
-- **State Machines** for anything with states (game flow, van lifecycle, UI panels)
-- **Object Pooling** for anything instantiated at runtime (use Unity's built-in `UnityEngine.Pool.ObjectPool<T>`)
-- **Data-Driven Design** — all tuning values in ScriptableObjects, not hardcoded
-
-### Performance Rules
-- Target: **Stable 60 FPS** on mid-range mobile devices
-- **Zero allocations in Update()** — no `new`, no LINQ, no string concatenation, no boxing
-- **Cache all references** — never use `Camera.main`, `FindObjectOfType`, or `GetComponent` in Update
-- **Object pool everything** — animals, VFX, floating text, audio sources
-- **Sprite Atlas** all sprites — minimize draw calls
-- **Particle budget:** Max 200 particles on screen at once
-- **Audio:** OGG Vorbis format, compressed, preloaded for SFX, streaming for music
+Full art direction details are in `Docs/03_ART_BIBLE.md`.
 
 ---
 
-## 4. Unity 6 Technology Stack (CRITICAL — Always Use These)
+## 3. User Profile
 
-> **IMPORTANT:** Unity 6 (6000.x) has significant changes from earlier versions. Always use the current systems listed below. Never fall back to deprecated alternatives.
+- **Skill Level:** Beginner Unity developer. Knows basics but needs step-by-step guidance.
+- **Teaching Standard:**
+  - Always explain "why" before "what".
+  - Give numbered step-by-step instructions with exact menu paths.
+  - Provide **complete code files** (never partial snippets missing context).
+  - Include checkpoint verification after each step.
+  - **CRITICAL:** NEVER silently change values, inspector settings, or defaults tuned by the user (e.g. spacing, speed, scale, thresholds). Always explicitly inform the user whenever modifying any values and explain why.
+  - **CRITICAL: Git Version Control:** Commit changes to git and push to `origin main` (remote: `https://github.com/Dishu223/StraySwarm`) after every major feature/update completed with the user. Always use descriptive, structured commit messages.
+  - Be patient, encouraging, and thorough.
 
-### ✅ USE (Current Systems)
+---
 
-| System | Package/Namespace | Notes |
-|---|---|---|
-| **New Input System** | `com.unity.inputsystem` / `UnityEngine.InputSystem` | Use `InputAction` assets, `PlayerInput` component, or direct `InputAction` references. **Old `Input.GetKey/GetAxis` is deprecated.** |
-| **TextMeshPro (UGUI)** | Built into Unity 6 as `com.unity.ugui` | Use `TMPro.TextMeshProUGUI` for UI text. No need to import separately. `using TMPro;` |
-| **Cinemachine** | `com.unity.cinemachine` (v3.x) | Renamed classes: `CinemachineCamera` (was `CinemachineVirtualCamera`). Use for 2D follow camera |
-| **URP 2D Renderer** | `com.unity.render-pipelines.universal` | Light2D (Point, Global, Spot, Freeform), 2D shadow casters, Volume-based post-processing |
-| **Built-in Object Pooling** | `UnityEngine.Pool.ObjectPool<T>` | Use instead of custom pooling. Has `Get()`, `Release()`, `CountActive`, `CountInactive` |
-| **Awaitable / async** | `UnityEngine.Awaitable` | Unity 6 native async support. Use `await Awaitable.WaitForSecondsAsync()` instead of coroutines where appropriate |
-| **Sprite Atlas v2** | `com.unity.2d.sprite` | Use SpriteAtlas V2 for better packing and runtime performance |
-| **2D Tilemap** | `com.unity.2d.tilemap` | For environment tiles. Use Rule Tiles for smart auto-tiling |
-| **Profiler** | Built-in | Use Frame Debugger + Profiler for mobile performance. Deep Profile for allocations |
+## 4. Current Project State (UPDATED 2026-08-13)
 
-### ❌ DO NOT USE (Deprecated/Legacy)
+### What HAS Been Built (Prototype Complete)
 
-| Deprecated | Replacement |
-|---|---|
-| `Input.GetKeyDown()`, `Input.GetAxis()` | New Input System `InputAction` |
+**17 C# Scripts exist in `UnityProject/Assets/_StraySwarm/Scripts/`:**
+
+| Folder | Scripts | Status |
+| :--- | :--- | :--- |
+| `Audio/` | `AudioManager.cs` | ✅ Singleton, pitch-jitter, PlayCollect/Deliver/Win/Lose convenience methods. All clip slots empty (needs real audio files). |
+| `Core/` | `NodeData.cs` | ✅ Grid node data structure. |
+| `Core/` | `GridManager.cs` | ✅ Tilemap-based scanning + fallback test grid + debug Gizmos. |
+| `Core/` | `InputHandler.cs` | ✅ New Input System swipe detection with input buffering. |
+| `Core/` | `PlayerController.cs` | ✅ Node-to-node lerp, auto-cornering at dead-ends, 180° turns, Animator hooks (IsMoving, MoveX, MoveY). Uses `GetClosestNode()` for free placement. |
+| `Core/` | `GameManager.cs` | ✅ Timer countdown, Win/Loss state machine, Star calculation (1/2/3 based on time %), fires AudioManager & JuiceManager on events. |
+| `Core/` | `LevelManager.cs` | ✅ Scene reload, level playlist, DontDestroyOnLoad. |
+| `Data/` | `LevelData.cs` | ✅ ScriptableObject (time limit, star thresholds, van color sequence). |
+| `Gameplay/` | `PathHistory.cs` | ✅ Breadcrumb `LinkedList<PathPoint>` recording, distance-based position lookup. |
+| `Gameplay/` | `TailManager.cs` | ✅ Conga-line follow system, staggered delivery coroutine (0.15s per animal), `_isDelivering` flag prevents double-delivery. |
+| `Gameplay/` | `FollowerBehavior.cs` | ✅ `IsCollected` flag, `AnimalColor` string, `FlyToVan()` coroutine animation. |
+| `Gameplay/` | `RescueStation.cs` | ✅ `OnTriggerEnter2D`/`Stay2D`/`Exit2D`, `_isPlayerInside` enforcement, public `AttemptDelivery()`. |
+| `Gameplay/` | `VanController.cs` | ✅ Color matching, `IsParked` state, Squash&Stretch `BounceRoutine()`, `DelayedDriveAwayRoutine()` (0.4s delay). |
+| `Gameplay/` | `VanQueue.cs` | ✅ Sequential van spawning, `DriveInRoutine()` with `SetParked()` callback, race-condition safe. |
+| `Gameplay/` | `JuiceManager.cs` | ✅ Singleton, spawns particle prefabs (collect, deliver, confetti). Sets sortingOrder=100. |
+| `Gameplay/` | `CameraShake.cs` | ✅ Lightweight random-offset shake, triggered on delivery. |
+| `UI/` | `UIManager.cs` | ✅ Timer HUD (Deep Rust color, red warning <10s), Win/Lose panels, EaseOutBack bouncy panel + sequential star pop coroutine, `OnNextLevelButtonClicked()` / `OnRestartButtonClicked()`. |
+
+### Unity Scene Configuration Done
+- Canvas: Screen Space - Camera, Scale With Screen Size (1080×1920), Match=0.5.
+- Floor Tilemap: Order in Layer = -10.
+- Camera: Orthographic, Size=10.
+- Player: Tagged "Player", Kinematic Rigidbody2D, Trigger CircleCollider2D.
+- Animator Controller: `CatAnimator` with IsMoving (Bool), MoveX/MoveY (Float), Idle↔Run transitions.
+- Color Palette: Background=#FFF7ED, Primary=#F97316, CTA=#2563EB, Text=#9A3412.
+- Font: Lilita One imported as TMP Font Asset.
+- Win Panel: Floating card (800×1100), 3 star slots, "NEXT LEVEL" button wired.
+- Lose Panel: "RETRY" button wired.
+- Particle: WinConfettiPrefab saved in Prefabs folder.
+
+### What Has NOT Been Built (Critical Gaps)
+1. ❌ ScriptableObject Event Bus (systems coupled via FindAnyObjectByType)
+2. ❌ AnimalData ScriptableObject (using raw string for color)
+3. ❌ Object Pooling (using Instantiate/Destroy)
+4. ❌ Save System (no persistence)
+5. ❌ Multi-scene architecture (only 1 scene, no Boot/MainMenu/LevelSelect)
+6. ❌ Main Menu, Level Select, Settings, Pause Menu screens
+7. ❌ Real art assets (using Unity primitive shapes)
+8. ❌ Real audio files (all AudioManager clip slots empty)
+9. ❌ 50+ levels across 4 themed worlds (only 1 test Tilemap exists)
+10. ❌ Combo System
+11. ❌ Cinemachine v3
+12. ❌ DOTween (using custom coroutine animations)
+13. ❌ URP 2D Lighting & Post-Processing
+14. ❌ Haptic feedback
+15. ❌ Colorblind accessibility (shape icons)
+16. ❌ Currency, Shop, Monetization
+17. ❌ Tutorial/Onboarding
+18. ❌ Sorting Layers (not configured)
+19. ❌ Awaitable async (using Coroutines)
+20. ❌ Multi-station architecture (currently uses single VanQueue, need multiple simultaneous stations)
+21. ❌ Obstacle system (one-way arrows, rock barriers, numbered walls, bridges)
+22. ❌ Themed world tile sets (Rule Tiles with rounded corners for Desert/Forest/Winter/City)
+23. ❌ Pre-level screen (showing level info before starting)
+24. ❌ World map level select (with world-unlock gates based on total stars)
+25. ❌ Cube Wobble animation system (CubeWobble.cs, BasketBounce.cs, StationPulse.cs)
+26. ❌ Basket tail visual system (animals in baskets instead of raw followers)
+
+---
+
+## 5. Strict Technical Rules (Unity 6)
+
+> [!CAUTION]
+> **NEVER use deprecated APIs. The following are STRICTLY FORBIDDEN:**
+
+| ❌ FORBIDDEN | ✅ USE INSTEAD |
+| :--- | :--- |
+| `Input.GetKeyDown()` / `Input.GetAxis()` | New Input System `InputAction` |
 | `UnityEngine.UI.Text` | `TMPro.TextMeshProUGUI` |
 | `CinemachineVirtualCamera` | `CinemachineCamera` (Cinemachine v3) |
-| `OnGUI()` | Never use. UI Toolkit or UGUI Canvas |
-| `WWW` | `UnityWebRequest` |
-| `Application.LoadLevel()` | `SceneManager.LoadScene()` |
-| Custom object pool scripts | `UnityEngine.Pool.ObjectPool<T>` |
-| `StartCoroutine` for simple delays | `Awaitable.WaitForSecondsAsync()` |
-| Legacy `Animation` component | `Animator` or DOTween |
-| `PlayerPrefs` for complex data | JSON serialization to `Application.persistentDataPath` |
+| Custom object pool | `UnityEngine.Pool.ObjectPool<T>` |
+| `PlayerPrefs` for save data | JSON to `Application.persistentDataPath` |
+| `FindObjectOfType<T>()` | `FindAnyObjectByType<T>()` or proper dependency injection |
+| Legacy Sprite Packer | Sprite Atlas V2 |
+| Old Tilemap brushes | Rule Tiles + Tile Palette |
 
-### Package Manifest (Recommended)
-These packages should be in the Unity project:
-```
-com.unity.render-pipelines.universal    (URP — included with template)
-com.unity.inputsystem                   (New Input System)
-com.unity.cinemachine                   (Camera — v3.x)
-com.unity.2d.sprite                     (Sprite tools + Atlas V2)
-com.unity.2d.tilemap                    (Tilemap — if using tile-based environment)
-com.unity.2d.tilemap.extras             (Rule Tiles, animated tiles)
-com.unity.ugui                          (UI + TextMeshPro — included)
-com.unity.2d.animation                  (Sprite rigging/animation — optional)
-```
+---
 
-Third-party:
+## 6. Architecture Conventions
+
+### Namespace Structure
 ```
-DOTween (Demigiant)                     (Animation tweening — import via .unitypackage)
+StraySwarm.Core       — GameManager, GridManager, InputHandler, PlayerController, LevelManager
+StraySwarm.Gameplay   — TailManager, PathHistory, FollowerBehavior, RescueStation, VanController, VanQueue, JuiceManager, CameraShake, ComboTracker, CubeWobble, BasketBounce, StationPulse
+StraySwarm.Data       — LevelData, AnimalData, GameSettings
+StraySwarm.Audio      — AudioManager
+StraySwarm.UI         — UIManager, MainMenuUI, LevelSelectUI, PauseMenuUI, SettingsUI
+StraySwarm.Events     — GameEvent, GameEventListener
+StraySwarm.Utils      — ObjectPoolManager, SaveManager
 ```
 
----
+### Folder Structure
+```
+Assets/_StraySwarm/
+├── Animations/       — Animator Controllers, Animation Clips
+├── Art/
+│   ├── Characters/   — Animal & cat sprite sheets
+│   ├── Environment/  — Tile sets, props, backgrounds
+│   └── UI/           — Buttons, panels, stars, icons
+├── Audio/
+│   ├── BGM/          — Background music .ogg files
+│   └── SFX/          — Sound effect .wav files
+├── Data/
+│   ├── Animals/      — AnimalData ScriptableObject assets
+│   ├── Levels/       — LevelData ScriptableObject assets
+│   └── Settings/     — GameSettings ScriptableObject asset
+├── Materials/        — URP Sprite-Lit materials
+├── Prefabs/
+│   ├── Characters/   — Player, Animal prefabs
+│   ├── Core/         — Grid, Station prefabs
+│   ├── Environment/  — Deco prop prefabs
+│   └── UI/           — Panel prefabs
+├── Scenes/
+│   ├── 0_Boot.unity
+│   ├── 1_MainMenu.unity
+│   ├── 2_LevelSelect.unity
+│   └── 3_Gameplay.unity
+├── Scripts/          — (see namespace structure above)
+└── Tiles/            — Rule Tile assets, Tile Palettes
+```
 
-## 5. Asset Creation Guidance
+### Scene Architecture
+```
+0_Boot (Persistent)
+  └── Spawns: AudioManager, LevelManager, SaveManager, CurrencyManager
+  └── Loads: 1_MainMenu additively
 
-### When The User Creates Assets in Blender
-Guide them on:
-- **Export format:** FBX or PNG sprite sheets (for 2D, we render 3D models to 2D sprites)
-- **Sprite rendering workflow:** Set up orthographic camera in Blender, render character from top-down, export as PNG with transparency
-- **Resolution:** 128×128px per character tile (retina-ready at 2x = 256×256)
-- **Pivot points:** Centered at character's feet for proper Y-sorting
-- **Color matching:** Reference the Art Bible color palette (provide hex codes)
+1_MainMenu
+  └── Title, Play button, Settings button, coin display
 
-### When The User Uses Asset Store
-Guide them on:
-- **What to look for:** 2D sprite packs with consistent art style, top-down perspective
-- **License checking:** Ensure assets allow commercial use
-- **Integration:** How to import, organize, and adapt store assets to match the project style
-- **Consistency:** All assets must feel like they belong in the same visual world
+2_LevelSelect
+  └── Scrollable level nodes with star/lock state from SaveManager
 
-### Placeholder Assets
-During prototyping phases, provide guidance on creating simple placeholder assets:
-- Colored squares/circles for characters
-- Simple geometric shapes for tiles
-- Solid color blocks for UI panels
-- The goal is to test mechanics before investing in final art
-
----
-
-## 6. Workflow Protocol
-
-### Before Each Work Session
-1. Reference the [TODO.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/TODO.md) to identify current phase and next tasks
-2. Remind the user what was accomplished last session
-3. Outline what we'll tackle this session (2-4 tasks max)
-4. Ensure Unity project is open and running correctly
-
-### During Each Work Session
-1. Work through tasks one at a time, in order
-2. After each task, verify it works (provide test steps)
-3. If something breaks, debug it immediately — don't move on
-4. Update TODO.md as tasks are completed
-5. Commit to Git at logical checkpoints (after each working feature)
-
-### After Each Work Session
-1. Summarize what was accomplished
-2. Note any issues or decisions for next session
-3. Preview what's coming next
-4. Update CHANGELOG.md if a milestone was reached
-
-### Git Commit Protocol
-Suggest commits at these points:
-- After each new system is working
-- After significant bug fixes
-- After completing a phase milestone
-- Before making risky changes (so we can revert)
-
-Commit message format: `[Phase X] Brief description of what was added/changed`
+3_Gameplay (loaded per level)
+  └── Grid, Canvas, GameManager, GridManager, InputHandler, PlayerController,
+      TailManager, PathHistory, RescueStation, VanQueue, JuiceManager, UIManager
+```
 
 ---
 
-## 7. Error Handling & Debugging Guidance
+## 7. Production Roadmap Phases
 
-When the user encounters an error:
+The full production plan is documented in:
+- **`Docs/00_FINAL_OVERVIEW_PLAN.md`** — Original 8-phase plan
+- **Artifact: `project_audit_and_roadmap.md`** — Updated 9-phase production roadmap (Phases A through I)
 
-1. **Ask them to share the exact error message** (console output)
-2. **Explain what the error means** in plain language
-3. **Explain why it happened** — what went wrong
-4. **Provide the fix** step by step
-5. **Teach the prevention** — how to avoid this in the future
+**Priority order for remaining work:**
+1. Phase A: Architecture Refactor (Event Bus, AnimalData, Pooling, SaveSystem, Multi-Station, Obstacle System)
+2. Phase B: Art Production (Blender renders, Rule Tile sets for 4 worlds, UI art, drop shadows)
+3. Phase C: Audio Production (SFX, BGM)
+4. Phase D: Complete UI/UX (Boot, MainMenu, World Map LevelSelect, Pause, Settings, Pre-Level screen)
+5. Phase E: Gameplay Completion (Combo, Cinemachine, DOTween, Lighting, Haptics, Tutorial, One-Way Arrows, Numbered Walls, Bridges)
+6. Phase F: Content Creation (50+ levels across 4 themed worlds: Desert, Forest, Winter, City)
+7. Phase G: Polish & Optimization (Profiling, Sorting, Accessibility, Testing)
+8. Phase H: Monetization & Meta (Currency, Shop, World-Unlock Gates, Ads, Analytics)
+9. Phase I: Publishing (Store builds, listings, release)
 
-Common beginner errors to watch for:
-- NullReferenceException → missing component reference or unassigned Inspector field
-- Missing namespace → forgot a `using` statement
-- Script not executing → not attached to a GameObject
-- Serialized field not showing → wrong access modifier or missing `[SerializeField]`
-- Input not working → Input Actions asset not configured or not enabled
-
----
-
-## 8. Scope Management
-
-### The Golden Rule
-**If a feature isn't in the current phase, don't build it.** Resist scope creep.
-
-### When The User Wants to Add Something New
-1. Acknowledge the idea enthusiastically
-2. Add it to the [Ideas Backlog](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/10_IDEAS_BACKLOG.md)
-3. Explain where it fits in the roadmap
-4. Gently redirect to the current phase's tasks
-5. If it's small and relevant, consider adding it to the current phase
-
-### Priority Order (When Deciding What to Build)
-1. **Core mechanics** — does the game play correctly?
-2. **Performance** — does it run at 60 FPS on mobile?
-3. **Game feel / juice** — does it feel satisfying?
-4. **Content** — are there enough levels?
-5. **Polish** — is every detail refined?
-6. **Publishing** — is it store-ready?
+**Detailed roadmap with all sub-tasks is in the artifact: `project_audit_and_roadmap.md`**
 
 ---
 
-## 9. Quality Checklist (Apply to Every Feature)
+## 8. First Steps for a New AI Session
 
-Before marking any feature as "done," verify:
+If you are starting a new conversation on this project, do the following IN ORDER:
 
-- [ ] Code follows naming conventions and style guide
-- [ ] No hardcoded values — everything configurable via ScriptableObject or constant
-- [ ] No `Update()` allocations — zero GC in hot paths
-- [ ] References cached — no `Find` or `GetComponent` in loops
-- [ ] Events used for cross-system communication — no direct manager references
-- [ ] Null checks present — handles missing references gracefully
-- [ ] Works on mobile — tested input, performance, resolution
-- [ ] Has visual feedback — player can see the result of their action
-- [ ] Has audio feedback — player can hear the result of their action
-- [ ] Edge cases handled — what happens at boundaries, with empty data, etc.
+1. **Read this file** (`Docs/AI_AGENT_INSTRUCTIONS.md`) completely.
+2. **Read** `Docs/00_FINAL_OVERVIEW_PLAN.md` for the full game vision.
+3. **Scan** the `Scripts/` folder to see current codebase state.
+4. **Ask the user** what they want to work on next.
+5. **Check** which Phase (A–I) the requested work falls under.
+6. **Follow** the teaching standard: step-by-step, explain why, full code, verify.
 
----
-
-## 10. Project Documentation Map
-
-Always reference the correct document when discussing a topic:
-
-| Topic | Document |
-|---|---|
-| Game rules, mechanics, progression | [01_GAME_DESIGN_DOCUMENT.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/01_GAME_DESIGN_DOCUMENT.md) |
-| Code architecture, systems, modules | [02_TECHNICAL_ARCHITECTURE.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/02_TECHNICAL_ARCHITECTURE.md) |
-| Visual style, colors, sprites | [03_ART_BIBLE.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/03_ART_BIBLE.md) |
-| Sound design, music, SFX | [04_AUDIO_BIBLE.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/04_AUDIO_BIBLE.md) |
-| Animations, particles, camera, feel | [05_GAME_JUICE_BIBLE.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/05_GAME_JUICE_BIBLE.md) |
-| Level creation methodology | [06_LEVEL_DESIGN_GUIDE.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/06_LEVEL_DESIGN_GUIDE.md) |
-| Asset checklist and status | [07_ASSET_TRACKER.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/07_ASSET_TRACKER.md) |
-| Store publishing process | [08_PUBLISHING_GUIDE.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/08_PUBLISHING_GUIDE.md) |
-| Dev tips and best practices | [09_TIPS_AND_TRICKS.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/09_TIPS_AND_TRICKS.md) |
-| Future feature ideas | [10_IDEAS_BACKLOG.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/10_IDEAS_BACKLOG.md) |
-| Task tracking | [TODO.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/TODO.md) |
-| Version history | [CHANGELOG.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/CHANGELOG.md) |
-| AI behavior instructions | [AI_AGENT_INSTRUCTIONS.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/AI_AGENT_INSTRUCTIONS.md) (this file) |
+> [!IMPORTANT]
+> **NEVER** skip reading this file. **NEVER** assume what has or hasn't been built. **ALWAYS** scan the codebase first. The project state described in this file may be outdated — the codebase is the source of truth.
 
 ---
 
-## 11. Emergency Protocols
+## 9. Quality Bar
 
-### If The Project Won't Open in Unity
-1. Check Unity Hub for the correct Unity 6 version
-2. Delete the `Library/` folder and let Unity reimport
-3. Check Console for package errors
-4. Verify `.meta` files weren't deleted
+The user has explicitly stated:
+> *"I hope we make it a breathtakingly beautiful game in both looks and feel!"*
+> *"Our graphics will be much better, best in fact, and gameplay super smooth and animations and ui ux top notch."*
 
-### If Performance Drops Below 60 FPS
-1. Open Profiler (Window → Analysis → Profiler)
-2. Check top CPU consumers
-3. Check GC allocations
-4. Check draw calls in Frame Debugger
-5. Reference [09_TIPS_AND_TRICKS.md](file:///d:/Antigravity%20Projects/Stray%20Swarm/Docs/09_TIPS_AND_TRICKS.md) performance section
-
-### If The User Is Stuck or Frustrated
-1. Acknowledge the difficulty
-2. Break the problem into smaller steps
-3. Provide a working minimal example
-4. Offer an alternative simpler approach if needed
-5. Remind them that every game developer faces these challenges
-
----
-
-> *"The best time to document was yesterday. The second best time is now."*
-> This document should be updated whenever new conventions, tools, or workflows are established.
+**The quality bar is: TOP-TIER MOBILE GAME.** Think Crossy Road, Monument Valley, Alto's Odyssey level of polish. Every interaction must feel satisfying. Every screen must look premium. No placeholder art in the final build.

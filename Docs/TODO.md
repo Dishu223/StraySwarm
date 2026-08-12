@@ -39,17 +39,20 @@
 
 ---
 
-## Phase 1: Core Movement & Grid (Week 1)
-
-### Grid System
-- [ ] Create `NodeData.cs` (position, valid directions, occupant)
-- [ ] Create `GridManager.cs` (builds node graph, provides node lookup)
-- [ ] Build a test grid (7x7) in editor with Gizmo visualization
-- [ ] Validate node connectivity (unit test)
-
-### Input System
-- [ ] Create `InputHandler.cs` (swipe detection with configurable dead zone)
-- [ ] Implement input buffer (cache next direction before reaching intersection)
+## 🏃 Phase 1: Core Movement (COMPLETED)
+- [x] Create Unity 6 Project (2D URP)
+- [x] Set up folder structure
+- [x] Install New Input System
+- [x] Import DOTween & TMP
+- [x] Configure build settings (Mobile Portrait)
+- [x] Initialize Git repository
+- [x] Create `NodeData` structure
+- [x] Create `GridManager` (generates test grid)
+- [x] Create `InputHandler` (swipe detection via New Input System)
+- [x] Create `PlayerController` (node-to-node movement)
+- [x] Implement Input Buffering
+- [x] Implement Auto-Cornering
+- [x] Add Editor Gizmos for grid visualizationg intersection)
 - [ ] Add 180° turn prevention
 - [ ] Test on device with Unity Remote
 

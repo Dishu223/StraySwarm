@@ -1,0 +1,121 @@
+using UnityEngine;
+using System.Collections;
+
+namespace StraySwarm.Gameplay
+{
+    /// <summary>
+    /// Represents the delivery truck that accepts a specific color of animal.
+    /// </summary>
+    public class VanController : MonoBehaviour
+    {
+        public string RequiredColor = "Blue";
+        public int Capacity = 3;
+        
+        public bool IsFull => _currentLoad >= Capacity;
+        public bool IsDrivingAway { get; private set; } = false;
+        public bool IsParked { get; private set; } = false;
+        
+        private int _currentLoad = 0;
+
+        public void SetParked()
+        {
+            IsParked = true;
+        }
+
+        public bool TryAcceptAnimal(FollowerBehavior animal)
+        {
+            // Only accept animals if the van is fully parked and not full/driving away!
+            if (!IsParked || IsFull || IsDrivingAway) return false;
+            
+            if (animal.AnimalColor == RequiredColor)
+            {
+                _currentLoad++;
+                
+                // Play sound & particles!
+                if (JuiceManager.Instance != null)
+                {
+                    JuiceManager.Instance.PlayDeliverParticle(transform.position);
+                }
+
+                if (Audio.AudioManager.Instance != null)
+                {
+                    Audio.AudioManager.Instance.PlayDeliver();
+                }
+                
+                // Make the animal visually zip into the van!
+                animal.FlyToVan(this.transform);
+                
+                // Trigger a micro camera shake for subtle tactile impact!
+                if (CameraShake.Instance != null)
+                {
+                    CameraShake.Instance.Shake(0.1f, 0.05f);
+                }
+
+                // Trigger a juicy squash-and-stretch bounce on the van for each animal!
+                StartCoroutine(BounceRoutine());
+                
+                if (IsFull)
+                {
+                    DriveAway();
+                }
+                return true;
+            }
+            return false; // Wrong color!
+        }
+
+        private void DriveAway()
+        {
+            IsDrivingAway = true;
+            Debug.Log($"[VanController] {RequiredColor} Van is FULL! Driving away!");
+            
+            StartCoroutine(DelayedDriveAwayRoutine());
+        }
+
+        private IEnumerator DelayedDriveAwayRoutine()
+        {
+            // Wait 0.4 seconds so the final animal finishes zipping inside and the van finishes its happy bounce!
+            yield return new WaitForSeconds(0.4f);
+
+            float speed = 15f;
+            while (transform.position.x < 15f) // Drive off screen to the right
+            {
+                transform.position += Vector3.right * speed * Time.deltaTime;
+                yield return null;
+            }
+            
+            // Tell the queue to bring the next van
+            FindAnyObjectByType<VanQueue>()?.SpawnNextVan();
+            Destroy(gameObject);
+        }
+
+        /// <summary>
+        /// A juicy Squash & Stretch bounce animation when an animal jumps inside!
+        /// </summary>
+        private IEnumerator BounceRoutine()
+        {
+            float elapsed = 0f;
+            float duration = 0.1f;
+            Vector3 originalScale = transform.localScale;
+            Vector3 squishedScale = new Vector3(originalScale.x * 1.15f, originalScale.y * 0.85f, originalScale.z);
+
+            // 1. Squash down
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                transform.localScale = Vector3.Lerp(originalScale, squishedScale, elapsed / duration);
+                yield return null;
+            }
+
+            // 2. Stretch back
+            elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                transform.localScale = Vector3.Lerp(squishedScale, originalScale, elapsed / duration);
+                yield return null;
+            }
+
+            transform.localScale = originalScale;
+        }
+    }
+}
