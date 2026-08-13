@@ -52,14 +52,22 @@ namespace StraySwarm.UI
                 Audio.AudioManager.Instance.PlayButtonClick();
             }
 
-            // Load LevelSelect if scene exists, otherwise load Gameplay directly
+            // Load LevelSelect, 3_Gameplay, or SampleScene
             if (Application.CanStreamedLevelBeLoaded(_levelSelectScene))
             {
                 SceneManager.LoadScene(_levelSelectScene);
             }
-            else
+            else if (Application.CanStreamedLevelBeLoaded(_gameplayScene))
             {
                 SceneManager.LoadScene(_gameplayScene);
+            }
+            else if (Application.CanStreamedLevelBeLoaded("SampleScene"))
+            {
+                SceneManager.LoadScene("SampleScene");
+            }
+            else
+            {
+                Debug.LogWarning("[MainMenuUI] No valid gameplay scene found in Build Settings!");
             }
         }
 
