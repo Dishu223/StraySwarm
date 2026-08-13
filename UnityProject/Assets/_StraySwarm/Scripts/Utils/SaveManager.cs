@@ -8,15 +8,22 @@ namespace StraySwarm.Utils
     [Serializable]
     public class SaveData
     {
+        public int SaveVersion = 1;
         public int UnlockedLevel = 1;
         public int TotalCoins = 0;
         public string SelectedSkinId = "DefaultTabby";
-        public List<int> LevelStars = new List<int>(); // Stars earned per level index
+        public List<int> LevelStars = new List<int>(); // Stars earned per level index (0-indexed)
+
+        // Settings
+        public float SFXVolume = 1f;
+        public float MusicVolume = 0.7f;
+        public bool HapticsEnabled = true;
+        public bool ColorblindMode = false;
     }
 
     /// <summary>
-    /// Handles JSON saving and loading to Application.persistentDataPath.
-    /// Persists unlocked levels, stars, coins, and selected skins across game restarts.
+    /// Handles persistent JSON saving and loading to Application.persistentDataPath.
+    /// Persists unlocked levels, stars, coins, skins, and audio settings across game restarts.
     /// </summary>
     public class SaveManager : MonoBehaviour
     {
@@ -46,7 +53,6 @@ namespace StraySwarm.Utils
             {
                 string json = JsonUtility.ToJson(Data, true);
                 File.WriteAllText(SaveFilePath, json);
-                Debug.Log($"[SaveManager] Saved game data to {SaveFilePath}");
             }
             catch (Exception ex)
             {
@@ -62,7 +68,7 @@ namespace StraySwarm.Utils
                 {
                     string json = File.ReadAllText(SaveFilePath);
                     Data = JsonUtility.FromJson<SaveData>(json);
-                    Debug.Log($"[SaveManager] Loaded save data. Unlocked Level: {Data.UnlockedLevel}, Coins: {Data.TotalCoins}");
+                    Debug.Log($"[SaveManager] Loaded save data. Unlocked Level: {Data.UnlockedLevel}, Total Stars: {GetTotalStars()}, Coins: {Data.TotalCoins}");
                 }
                 else
                 {
@@ -91,9 +97,9 @@ namespace StraySwarm.Utils
             }
 
             // Unlock next level if completed
-            if (levelIndex + 1 > Data.UnlockedLevel)
+            if (levelIndex + 1 >= Data.UnlockedLevel)
             {
-                Data.UnlockedLevel = levelIndex + 1;
+                Data.UnlockedLevel = levelIndex + 2;
             }
 
             SaveGame();
@@ -108,9 +114,39 @@ namespace StraySwarm.Utils
             return 0;
         }
 
+        /// <summary>
+        /// Calculates the total cumulative stars earned across all levels (used for world unlock gates).
+        /// </summary>
+        public int GetTotalStars()
+        {
+            int total = 0;
+            if (Data.LevelStars != null)
+            {
+                for (int i = 0; i < Data.LevelStars.Count; i++)
+                {
+                    total += Data.LevelStars[i];
+                }
+            }
+            return total;
+        }
+
+        public bool IsWorldUnlocked(int starsRequired)
+        {
+            return GetTotalStars() >= starsRequired;
+        }
+
         public void AddCoins(int amount)
         {
             Data.TotalCoins += amount;
+            SaveGame();
+        }
+
+        public void SaveSettings(float sfx, float music, bool haptics, bool colorblind)
+        {
+            Data.SFXVolume = sfx;
+            Data.MusicVolume = music;
+            Data.HapticsEnabled = haptics;
+            Data.ColorblindMode = colorblind;
             SaveGame();
         }
     }

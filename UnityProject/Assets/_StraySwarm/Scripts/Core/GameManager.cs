@@ -27,6 +27,13 @@ namespace StraySwarm.Core
         
         private void Start()
         {
+            // Auto-fetch level data from LevelManager if available
+            if (LevelManager.Instance != null && LevelManager.Instance.GetCurrentLevelData() != null)
+            {
+                _currentLevel = LevelManager.Instance.GetCurrentLevelData();
+                _currentLevelIndex = LevelManager.Instance.CurrentLevelIndex;
+            }
+
             if (_currentLevel != null)
             {
                 TimeRemaining = _currentLevel.TimeLimit;
@@ -70,7 +77,8 @@ namespace StraySwarm.Core
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.SaveLevelStars(_currentLevelIndex, StarsEarned);
-                SaveManager.Instance.AddCoins(StarsEarned * 10);
+                int coinsToAward = _currentLevel != null ? _currentLevel.CoinReward : (StarsEarned * 10);
+                SaveManager.Instance.AddCoins(coinsToAward);
             }
 
             // Raise Event Channel
@@ -113,8 +121,10 @@ namespace StraySwarm.Core
         {
             if (_currentLevel == null) return 1;
 
-            if (TimeRemaining >= _currentLevel.ThreeStarTimeRemaining) return 3;
-            if (TimeRemaining >= _currentLevel.TwoStarTimeRemaining) return 2;
+            float ratio = _currentLevel.TimeLimit > 0 ? (TimeRemaining / _currentLevel.TimeLimit) : 0.5f;
+
+            if (ratio >= _currentLevel.ThreeStarPercentage) return 3;
+            if (ratio >= _currentLevel.TwoStarPercentage) return 2;
             return 1;
         }
     }

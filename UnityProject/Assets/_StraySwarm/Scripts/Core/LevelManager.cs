@@ -1,22 +1,26 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections.Generic;
 using StraySwarm.Data;
 
 namespace StraySwarm.Core
 {
     /// <summary>
-    /// Manages loading levels, restarting, and progressing through the game playlist.
+    /// Manages the full world playlists, level navigation, and seamless scene transitions.
     /// </summary>
     public class LevelManager : MonoBehaviour
     {
         public static LevelManager Instance { get; private set; }
 
-        [Header("Level Playlist")]
-        [Tooltip("The list of all levels in your game!")]
+        [Header("Worlds Configuration")]
+        [SerializeField] private List<WorldData> _worlds = new List<WorldData>();
+
+        [Header("Flat Playlist (Fallback / Auto-Populated)")]
         [SerializeField] private List<LevelData> _levelPlaylist = new List<LevelData>();
 
-        private int _currentLevelIndex = 0;
+        public int CurrentWorldIndex { get; private set; } = 0;
+        public int CurrentLevelIndex { get; private set; } = 0;
+        public List<WorldData> Worlds => _worlds;
 
         private void Awake()
         {
@@ -24,6 +28,7 @@ namespace StraySwarm.Core
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
+                RebuildFlatPlaylist();
             }
             else
             {
@@ -31,27 +36,59 @@ namespace StraySwarm.Core
             }
         }
 
+        public void RebuildFlatPlaylist()
+        {
+            if (_worlds != null && _worlds.Count > 0)
+            {
+                _levelPlaylist.Clear();
+                foreach (var world in _worlds)
+                {
+                    if (world != null && world.Levels != null)
+                    {
+                        _levelPlaylist.AddRange(world.Levels);
+                    }
+                }
+            }
+        }
+
         public LevelData GetCurrentLevelData()
         {
+            if (_levelPlaylist.Count == 0) RebuildFlatPlaylist();
             if (_levelPlaylist.Count == 0) return null;
-            return _levelPlaylist[Mathf.Clamp(_currentLevelIndex, 0, _levelPlaylist.Count - 1)];
+            return _levelPlaylist[Mathf.Clamp(CurrentLevelIndex, 0, _levelPlaylist.Count - 1)];
+        }
+
+        public void SelectLevel(int flatIndex)
+        {
+            CurrentLevelIndex = Mathf.Clamp(flatIndex, 0, Mathf.Max(0, _levelPlaylist.Count - 1));
+        }
+
+        public void SelectWorldAndLevel(int worldIndex, int levelIndexInWorld)
+        {
+            CurrentWorldIndex = worldIndex;
+            int flatIndex = 0;
+
+            for (int w = 0; w < worldIndex && w < _worlds.Count; w++)
+            {
+                if (_worlds[w] != null) flatIndex += _worlds[w].Levels.Count;
+            }
+            flatIndex += levelIndexInWorld;
+            SelectLevel(flatIndex);
         }
 
         public void LoadNextLevel()
         {
-            _currentLevelIndex++;
-            if (_currentLevelIndex >= _levelPlaylist.Count)
+            CurrentLevelIndex++;
+            if (CurrentLevelIndex >= _levelPlaylist.Count)
             {
-                _currentLevelIndex = 0; // Loop back to level 1 (or show Game Completed screen!)
+                CurrentLevelIndex = 0; // Or return to Main Menu / Victory
             }
 
-            // Reload the main scene to start the next level fresh!
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
         public void RestartCurrentLevel()
         {
-            // Reload current level
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }

@@ -18,6 +18,7 @@ namespace StraySwarm.Gameplay
 
         public bool IsCollected { get; private set; } = false;
         public AnimalData Data => _animalData;
+        public AnimalType AnimalType => _animalData != null ? _animalData.Type : AnimalType.BluePuppy;
 
         private SpriteRenderer _spriteRenderer;
         private CubeWobble _wobble;

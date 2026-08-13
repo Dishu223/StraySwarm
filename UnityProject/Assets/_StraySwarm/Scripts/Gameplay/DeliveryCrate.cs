@@ -32,11 +32,19 @@ namespace StraySwarm.Gameplay
             _originalScale = transform.localScale;
         }
 
+        public void Initialize(AnimalType type, int capacity)
+        {
+            TargetAnimalType = type;
+            Capacity = capacity;
+            RequiredColor = type.ToString().Replace("Puppy", "").Replace("Kitten", "").Replace("Pigeon", "").Replace("Frog", "").Replace("Hamster", "").Replace("Bunny", "");
+        }
+
         public bool TryAcceptAnimal(FollowerBehavior animal)
         {
-            if (IsFull) return false;
+            if (IsFull || animal == null) return false;
 
-            if (animal.AnimalColor == RequiredColor)
+            bool isMatch = (animal.Data != null && animal.Data.Type == TargetAnimalType) || (animal.AnimalColor == RequiredColor);
+            if (isMatch)
             {
                 _currentLoad++;
 
