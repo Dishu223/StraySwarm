@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99dbe640b9642464583283a2b0db2d8d, type: 3}
+  m_Name: Level_40
+  m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Data.LevelData
+  LevelID: 40
+  LevelName: Forest - Stage 20
+  World: 1
+  TimeLimit: 100
+  ThreeStarPercentage: 0.6
+  TwoStarPercentage: 0.3
+  CoinReward: 110
+  AnimalSpawns: []
+  Stations: []
+  VanSequence:
+  - Green
+  - Orange
+  - Purple
+  - Yellow
+  - Pink
+  - Blue

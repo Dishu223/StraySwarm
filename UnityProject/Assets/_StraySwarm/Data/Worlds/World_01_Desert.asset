@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 111a766452a80b247ba3ed2180f2bdeb, type: 3}
+  m_Name: World_01_Desert
+  m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Data.WorldData
+  WorldName: Desert Oasis
+  Theme: 0
+  WorldIcon: {fileID: 0}
+  WorldColor: {r: 0.96, g: 0.73, b: 0.42, a: 1}
+  StarsRequiredToUnlock: 0
+  WorldBGM: {fileID: 0}
+  Levels:
+  - {fileID: 11400000, guid: f97816273491ed042b0d26c981320551, type: 2}
+  - {fileID: 11400000, guid: f287a81c8f881be4aa3ba7de8a876cdf, type: 2}
+  - {fileID: 11400000, guid: f46793ec95675254ab9b8993134754c0, type: 2}
+  - {fileID: 11400000, guid: c2bee1ed2d6691e4e94dbaa6fd772f98, type: 2}
+  - {fileID: 11400000, guid: cb3cbfcb12b877f4885d0b67efa11806, type: 2}
+  - {fileID: 11400000, guid: 1c3eb8b255dedeb4f99755fd0ebdf2a1, type: 2}
+  - {fileID: 11400000, guid: 4c401ed50e561ac4098cd41389a911da, type: 2}
+  - {fileID: 11400000, guid: ddbfef2e90d151c40936efea8f4ecf4d, type: 2}
+  - {fileID: 11400000, guid: 8090b6efbd8b49f4d9bd5f85cc32440a, type: 2}
+  - {fileID: 11400000, guid: 67983c9649b29ed4285d927d504398a0, type: 2}
+  - {fileID: 11400000, guid: 656d173f011bfcb458a5c3bd6d274e46, type: 2}
+  - {fileID: 11400000, guid: d1be5fec7d2a1b44d8ee3692ae5045ea, type: 2}
+  - {fileID: 11400000, guid: 0b95f75403b5c4148b403ec2037336af, type: 2}
+  - {fileID: 11400000, guid: ee01a91f684832a408f739efa9bffa79, type: 2}
+  - {fileID: 11400000, guid: 7d4a23078e5c87c4ebe1b2934bb55724, type: 2}
+  - {fileID: 11400000, guid: ad85494168788164aa45b3c46c4ceed2, type: 2}
+  - {fileID: 11400000, guid: 166fbaac83b97394688513b9ebcf5c2b, type: 2}
+  - {fileID: 11400000, guid: f7ac061c557dfd34e82825183befb6cc, type: 2}
+  - {fileID: 11400000, guid: 87803233284dce940849954833d85fe6, type: 2}
+  - {fileID: 11400000, guid: 5e33f2950bfd0c040b4f2c7f4c8cf915, type: 2}

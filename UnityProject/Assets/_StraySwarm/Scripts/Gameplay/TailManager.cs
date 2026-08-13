@@ -65,10 +65,17 @@ namespace StraySwarm.Gameplay
                     JuiceManager.Instance.PlayCollectParticle(animal.transform.position);
                 }
 
-                // Play juicy pop sound!
+                // Play custom animal species sound if assigned, otherwise play harmonic collect pop!
                 if (Audio.AudioManager.Instance != null)
                 {
-                    Audio.AudioManager.Instance.PlayCollect();
+                    if (animal.Data != null && animal.Data.CollectSound != null)
+                    {
+                        Audio.AudioManager.Instance.PlaySound(animal.Data.CollectSound);
+                    }
+                    else
+                    {
+                        Audio.AudioManager.Instance.PlayCollect();
+                    }
                 }
             }
         }

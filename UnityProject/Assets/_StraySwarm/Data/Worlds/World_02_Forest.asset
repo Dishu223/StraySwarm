@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 111a766452a80b247ba3ed2180f2bdeb, type: 3}
+  m_Name: World_02_Forest
+  m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Data.WorldData
+  WorldName: Whispering Forest
+  Theme: 1
+  WorldIcon: {fileID: 0}
+  WorldColor: {r: 0.36, g: 0.72, b: 0.36, a: 1}
+  StarsRequiredToUnlock: 30
+  WorldBGM: {fileID: 0}
+  Levels:
+  - {fileID: 11400000, guid: 37c47c65550c2474aad6ed8b59644ff2, type: 2}
+  - {fileID: 11400000, guid: 9df0c9ef586937f4d970d9381010aeb4, type: 2}
+  - {fileID: 11400000, guid: 0aeda7f19bc75e844974683af5f9c556, type: 2}
+  - {fileID: 11400000, guid: e5510e5f22bc0004eb85b7a09e4a0dfc, type: 2}
+  - {fileID: 11400000, guid: 08779d84b1193b147a89a8da9395136d, type: 2}
+  - {fileID: 11400000, guid: fdddf5d2099334843be80a486a7169ef, type: 2}
+  - {fileID: 11400000, guid: 4c48d236262cf39489e3f842c48f80a9, type: 2}
+  - {fileID: 11400000, guid: 05ba2ae47804b4845a8ab2db98c8fd39, type: 2}
+  - {fileID: 11400000, guid: 7b91ea582fe5255428ce7fafcf17d88d, type: 2}
+  - {fileID: 11400000, guid: e14a57215e8040149b0c84cb40672ebe, type: 2}
+  - {fileID: 11400000, guid: 60ac3a5a3bcd44644a05607ee58704b2, type: 2}
+  - {fileID: 11400000, guid: ad4209ca5e96f2b4d904de305748a9ff, type: 2}
+  - {fileID: 11400000, guid: 5b517d563574d2848a358f77271f434b, type: 2}
+  - {fileID: 11400000, guid: 74ca9c25627f57b4bbcfd2cd3d60249c, type: 2}
+  - {fileID: 11400000, guid: 42ac097eec98a424e9d6c7e8be4d7f65, type: 2}
+  - {fileID: 11400000, guid: 8b806eb0c2553374db6f6864a36baf7f, type: 2}
+  - {fileID: 11400000, guid: 65e197ae9162bd74fbecdbd81be8f971, type: 2}
+  - {fileID: 11400000, guid: 89aea38d910cde048a535ad69cd59733, type: 2}
+  - {fileID: 11400000, guid: 2a50d33db58df4245bbdf46b1dd6caad, type: 2}
+  - {fileID: 11400000, guid: fd462c22ed514294fb181820b1c58373, type: 2}
