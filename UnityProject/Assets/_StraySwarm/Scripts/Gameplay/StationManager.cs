@@ -27,7 +27,7 @@ namespace StraySwarm.Gameplay
         public void RegisterAllCrates()
         {
             _crates.Clear();
-            DeliveryCrate[] found = FindObjectsByType<DeliveryCrate>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            DeliveryCrate[] found = FindObjectsByType<DeliveryCrate>(FindObjectsInactive.Exclude);
             _crates.AddRange(found);
             Debug.Log($"[StationManager] Registered {_crates.Count} delivery crates.");
         }

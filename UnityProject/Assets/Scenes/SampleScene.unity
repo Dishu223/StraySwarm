@@ -773,6 +773,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.TailManager
   _followerSpacing: 0.6
   _followSpeed: 25
+  _deliveryStaggerDelay: 0.08
   _pathHistory: {fileID: 0}
 --- !u!114 &350723422
 MonoBehaviour:
@@ -4291,12 +4292,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b556f400d9e282a46adca1f4fb7c25af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Audio.AudioManager
-  CollectSound: {fileID: 0}
-  DeliverSound: {fileID: 0}
-  VanDriveSound: {fileID: 0}
-  WinSound: {fileID: 0}
+  CollectSound: {fileID: 8300000, guid: 578b200e3bdd1bc488089899f6ca3727, type: 3}
+  DeliverSound: {fileID: 8300000, guid: c181199eb27ab5f4b82b4cfa50e370ec, type: 3}
+  CrateFullSound: {fileID: 0}
+  WallBreakSound: {fileID: 0}
+  Star1Sound: {fileID: 0}
+  Star2Sound: {fileID: 0}
+  Star3Sound: {fileID: 0}
+  WinSound: {fileID: 8300000, guid: 3562dce481c7b8b41aae2ca7104f0e4b, type: 3}
   LoseSound: {fileID: 0}
+  ButtonClickSound: {fileID: 8300000, guid: 621a8d78116b7cd4c870d188bbd97f9e, type: 3}
+  TimerWarningSound: {fileID: 0}
+  MenuBGM: {fileID: 0}
+  GameplayBGM: {fileID: 8300000, guid: 83f697ab52febd747869e76108c8f475, type: 3}
   MasterVolume: 1
+  SFXVolume: 1
+  MusicVolume: 0.7
 --- !u!4 &1853171981
 Transform:
   m_ObjectHideFlags: 0
