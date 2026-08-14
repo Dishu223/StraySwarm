@@ -80,8 +80,9 @@ namespace StraySwarm.Gameplay
                 _playerTransform.position = new Vector3(data.PlayerStartCell.x, data.PlayerStartCell.y, 0);
             }
 
-            // 2. Spawn Animals
-            if (data.AnimalSpawns != null)
+            // 2. Spawn Animals (only if WaveSpawner is not managing dynamic waves)
+            bool isWaveSpawnerActive = WaveSpawner.Instance != null || FindAnyObjectByType<WaveSpawner>() != null;
+            if (!isWaveSpawnerActive && data.AnimalSpawns != null)
             {
                 foreach (var entry in data.AnimalSpawns)
                 {

@@ -79,6 +79,22 @@ namespace StraySwarm.Gameplay
             _totalDelivered = 0;
             _liveAnimalsOnMap.Clear();
 
+            // Clean up any uncollected animals in scene to prevent duplicates
+            FollowerBehavior[] existingAnimals = FindObjectsByType<FollowerBehavior>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            foreach (var animal in existingAnimals)
+            {
+                if (!animal.IsCollected)
+                {
+                    Destroy(animal.gameObject);
+                }
+            }
+
+            foreach (var sp in _spawnPoints)
+            {
+                sp.IsOccupied = false;
+                sp.CurrentAnimal = null;
+            }
+
             // 3. Spawn Initial Wave
             SpawnWaveToCap();
 
