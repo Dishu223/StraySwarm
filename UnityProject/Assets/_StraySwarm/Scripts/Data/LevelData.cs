@@ -36,6 +36,7 @@ namespace StraySwarm.Data
 
     /// <summary>
     /// ScriptableObject defining the complete, handcrafted layout, objectives, and thresholds of a single level.
+    /// Supports both dynamic wave spawning and fixed handcrafted entity placements.
     /// </summary>
     [CreateAssetMenu(fileName = "LevelData_01", menuName = "Stray Swarm/Level Data")]
     public class LevelData : ScriptableObject
@@ -44,6 +45,19 @@ namespace StraySwarm.Data
         public int LevelID = 1;
         public string LevelName = "Level 1";
         public WorldTheme World = WorldTheme.Desert;
+
+        [Header("Wave Spawning Settings")]
+        [Tooltip("Total number of animals required to rescue and deliver to finish the level.")]
+        public int TotalAnimalsToRescue = 12;
+
+        [Tooltip("Maximum animals allowed on the map at the same time.")]
+        public int MaxConcurrentOnMap = 5;
+
+        [Tooltip("Animal species allowed to appear in this level.")]
+        public List<AnimalType> AllowedAnimalTypes = new List<AnimalType> { AnimalType.Puppy, AnimalType.Kitten };
+
+        [Tooltip("Seed offset for deterministic reproduction (defaults to LevelID * 1000).")]
+        public int SeedOffset = 0;
 
         [Header("Player Start Position")]
         public Vector2Int PlayerStartCell = new Vector2Int(0, 0);
@@ -61,21 +75,18 @@ namespace StraySwarm.Data
         [Header("Rewards")]
         public int CoinReward = 50;
 
-        [Header("Animal Spawns (Fixed Placements)")]
+        [Header("Fixed Placements (Optional Overrides)")]
         public List<AnimalSpawnEntry> AnimalSpawns = new List<AnimalSpawnEntry>();
-
-        [Header("Stations (Fixed Placements)")]
         public List<StationSpawnEntry> Stations = new List<StationSpawnEntry>();
-
-        [Header("Obstacles (Fixed Placements)")]
         public List<OneWayArrowSpawnEntry> OneWayArrows = new List<OneWayArrowSpawnEntry>();
         public List<NumberedWallSpawnEntry> NumberedWalls = new List<NumberedWallSpawnEntry>();
 
         [Header("Legacy Van Support")]
         public List<string> VanSequence = new List<string>();
 
-        // Legacy compatibility properties
+        // Helpers
         public float ThreeStarTimeRemaining => TimeLimit * ThreeStarPercentage;
         public float TwoStarTimeRemaining => TimeLimit * TwoStarPercentage;
+        public int GetDeterministicSeed() => (LevelID * 1000) + SeedOffset;
     }
 }

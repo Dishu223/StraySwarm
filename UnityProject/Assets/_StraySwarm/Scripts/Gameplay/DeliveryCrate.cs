@@ -60,6 +60,9 @@ namespace StraySwarm.Gameplay
                 // Fly animal to crate
                 animal.FlyToVan(this.transform);
 
+                // Notify WaveSpawner
+                WaveSpawner.Instance?.OnAnimalDelivered(animal);
+
                 // Tactile camera shake
                 if (CameraShake.Instance != null)
                 {
@@ -88,6 +91,9 @@ namespace StraySwarm.Gameplay
             }
 
             Debug.Log($"[DeliveryCrate] Crate for {TargetAnimalType} is FULL!");
+
+            // Notify WaveSpawner
+            WaveSpawner.Instance?.OnCrateCompleted(this);
             
             // 1. Check via StationManager if present
             if (StationManager.Instance != null)

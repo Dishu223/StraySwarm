@@ -72,6 +72,9 @@ namespace StraySwarm.Gameplay
             {
                 _wobble.TriggerHop(0.2f);
             }
+
+            // Notify WaveSpawner
+            WaveSpawner.Instance?.OnAnimalCollected(this);
         }
 
         public void FlyToVan(Transform targetTransform)

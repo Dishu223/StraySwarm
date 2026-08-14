@@ -9,7 +9,8 @@ using StraySwarm.Gameplay;
 namespace StraySwarm.Editor
 {
     /// <summary>
-    /// Custom Unity Editor tool to generate 40 complete, balanced, handcrafted level ScriptableObjects across 2 worlds!
+    /// Generates 40 complete, balanced, handcrafted level ScriptableObjects across 2 worlds.
+    /// Supports deterministic wave spawning, multi-station capacities, and obstacle curves.
     /// Menu: Stray Swarm -> 🌟 Generate 40 Predefined Handcrafted Levels (2 Worlds)
     /// </summary>
     public static class CreatePredefinedLevels
@@ -35,7 +36,7 @@ namespace StraySwarm.Editor
                 world1.WorldName = "Desert Oasis";
                 world1.Theme = WorldTheme.Desert;
                 world1.WorldColor = new Color(0.96f, 0.73f, 0.42f);
-                world1.StarsRequiredToUnlock = 0; // Unlocked from start!
+                world1.StarsRequiredToUnlock = 0;
                 AssetDatabase.CreateAsset(world1, $"{worldsPath}/World_01_Desert.asset");
             }
             world1.Levels.Clear();
@@ -56,76 +57,36 @@ namespace StraySwarm.Editor
                 level.ThreeStarPercentage = 0.6f;
                 level.TwoStarPercentage = 0.3f;
                 level.CoinReward = 30 + (i * 2);
+                level.SeedOffset = 0;
 
-                // Clear lists
-                level.AnimalSpawns.Clear();
-                level.Stations.Clear();
-                level.OneWayArrows.Clear();
-                level.NumberedWalls.Clear();
-
-                // Handcrafted placements
+                // Wave Settings & Balance Progression
                 if (i <= 5)
                 {
-                    level.TimeLimit = 45f;
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Puppy, GridPosition = new Vector2Int(3, 4), Capacity = 3 });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-1, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(0, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(1, 0) });
-                    if (i >= 3)
-                    {
-                        level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(0, -1) });
-                    }
+                    level.TotalAnimalsToRescue = 9 + (i - 1); // 9 to 13
+                    level.MaxConcurrentOnMap = 4;
+                    level.AllowedAnimalTypes = new List<AnimalType> { AnimalType.Puppy, AnimalType.Kitten };
+                    level.TimeLimit = 45f + (i * 2f);
                 }
                 else if (i <= 10)
                 {
-                    level.TimeLimit = 60f;
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Puppy, GridPosition = new Vector2Int(3, 4), Capacity = 3 });
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Kitten, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
-                    
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-2, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(2, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(-1, -1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(1, -1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(0, 1) });
-                    
-                    if (i >= 8)
-                    {
-                        level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Right, GridPosition = new Vector2Int(-1, 2) });
-                    }
+                    level.TotalAnimalsToRescue = 14 + (i - 6); // 14 to 18
+                    level.MaxConcurrentOnMap = 5;
+                    level.AllowedAnimalTypes = new List<AnimalType> { AnimalType.Puppy, AnimalType.Kitten, AnimalType.Pigeon };
+                    level.TimeLimit = 60f + (i * 2f);
                 }
                 else if (i <= 15)
                 {
-                    level.TimeLimit = 75f;
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Puppy, GridPosition = new Vector2Int(3, 4), Capacity = 3 });
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Pigeon, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
-
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-2, -1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(2, -1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(-1, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(1, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(0, 2) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(0, -2) });
-
-                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Up, GridPosition = new Vector2Int(0, -1) });
-                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 2, GridPosition = new Vector2Int(1, 1) });
+                    level.TotalAnimalsToRescue = 18 + (i - 11); // 18 to 22
+                    level.MaxConcurrentOnMap = 5;
+                    level.AllowedAnimalTypes = new List<AnimalType> { AnimalType.Puppy, AnimalType.Kitten, AnimalType.Pigeon, AnimalType.Frog };
+                    level.TimeLimit = 75f + (i * 2f);
                 }
                 else
                 {
-                    level.TimeLimit = 90f;
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Puppy, GridPosition = new Vector2Int(3, 4), Capacity = 4 });
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Frog, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
-
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-2, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(2, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(-1, 1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(1, 1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(-1, -2) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(1, -2) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(0, 3) });
-
-                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Right, GridPosition = new Vector2Int(-1, 2) });
-                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Left, GridPosition = new Vector2Int(1, -1) });
-                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 3, GridPosition = new Vector2Int(0, 0) });
+                    level.TotalAnimalsToRescue = 22 + (i - 16); // 22 to 26
+                    level.MaxConcurrentOnMap = 6;
+                    level.AllowedAnimalTypes = new List<AnimalType> { AnimalType.Puppy, AnimalType.Kitten, AnimalType.Pigeon, AnimalType.Frog };
+                    level.TimeLimit = 90f + (i * 2f);
                 }
 
                 EditorUtility.SetDirty(level);
@@ -163,59 +124,28 @@ namespace StraySwarm.Editor
                 level.ThreeStarPercentage = 0.6f;
                 level.TwoStarPercentage = 0.3f;
                 level.CoinReward = 50 + (stageInWorld * 3);
-
-                level.AnimalSpawns.Clear();
-                level.Stations.Clear();
-                level.OneWayArrows.Clear();
-                level.NumberedWalls.Clear();
+                level.SeedOffset = 0;
 
                 if (stageInWorld <= 5)
                 {
-                    level.TimeLimit = 60f;
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Frog, GridPosition = new Vector2Int(3, 4), Capacity = 3 });
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Mouse, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
-
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(-1, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(1, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Mouse, GridPosition = new Vector2Int(0, -1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Mouse, GridPosition = new Vector2Int(0, 1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-2, 2) });
-
-                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 2, GridPosition = new Vector2Int(0, 0) });
+                    level.TotalAnimalsToRescue = 12 + stageInWorld;
+                    level.MaxConcurrentOnMap = 5;
+                    level.AllowedAnimalTypes = new List<AnimalType> { AnimalType.Frog, AnimalType.Mouse, AnimalType.Puppy };
+                    level.TimeLimit = 65f + (stageInWorld * 2f);
                 }
                 else if (stageInWorld <= 10)
                 {
-                    level.TimeLimit = 75f;
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Frog, GridPosition = new Vector2Int(3, 4), Capacity = 3 });
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Bunny, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
-
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(-2, -1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Mouse, GridPosition = new Vector2Int(2, -1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Bunny, GridPosition = new Vector2Int(0, 2) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Bunny, GridPosition = new Vector2Int(-1, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(1, 0) });
-
-                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Up, GridPosition = new Vector2Int(0, 1) });
-                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 3, GridPosition = new Vector2Int(-1, -1) });
+                    level.TotalAnimalsToRescue = 16 + stageInWorld;
+                    level.MaxConcurrentOnMap = 6;
+                    level.AllowedAnimalTypes = new List<AnimalType> { AnimalType.Frog, AnimalType.Mouse, AnimalType.Bunny, AnimalType.Kitten };
+                    level.TimeLimit = 80f + (stageInWorld * 2f);
                 }
                 else
                 {
-                    level.TimeLimit = 95f;
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Bunny, GridPosition = new Vector2Int(3, 4), Capacity = 4 });
-                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Mouse, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
-
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-2, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(2, 0) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(-1, 1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Mouse, GridPosition = new Vector2Int(1, 1) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(-1, -2) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Bunny, GridPosition = new Vector2Int(1, -2) });
-                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Bunny, GridPosition = new Vector2Int(0, 3) });
-
-                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Right, GridPosition = new Vector2Int(-1, 2) });
-                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Down, GridPosition = new Vector2Int(1, 2) });
-                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 3, GridPosition = new Vector2Int(0, 0) });
-                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 2, GridPosition = new Vector2Int(0, -1) });
+                    level.TotalAnimalsToRescue = 20 + stageInWorld;
+                    level.MaxConcurrentOnMap = 6;
+                    level.AllowedAnimalTypes = new List<AnimalType> { AnimalType.Puppy, AnimalType.Kitten, AnimalType.Frog, AnimalType.Mouse, AnimalType.Pigeon, AnimalType.Bunny };
+                    level.TimeLimit = 95f + (stageInWorld * 2f);
                 }
 
                 EditorUtility.SetDirty(level);
@@ -226,8 +156,8 @@ namespace StraySwarm.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"🎉 [CreatePredefinedLevels] Successfully generated 40 Handcrafted Levels across 2 Worlds with complete animal, station, and obstacle placements!");
-            EditorUtility.DisplayDialog("Stray Swarm", "Successfully generated 40 Predefined Handcrafted Level assets across 2 Worlds!\n\nAll animals, delivery stations, one-way arrows, and breakable walls are configured!", "Awesome!");
+            Debug.Log($"🎉 [CreatePredefinedLevels] Successfully generated 40 Handcrafted Wave Level assets across 2 Worlds!");
+            EditorUtility.DisplayDialog("Stray Swarm", "Successfully generated 40 Predefined Handcrafted Level assets across 2 Worlds!\n\nDeterministic wave quotas, multi-species allowances, and balanced time limits are configured!", "Awesome!");
         }
 
         private static void EnsureDirectory(string path)
