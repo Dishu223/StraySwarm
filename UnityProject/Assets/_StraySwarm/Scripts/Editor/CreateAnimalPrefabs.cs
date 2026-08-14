@@ -51,8 +51,8 @@ namespace StraySwarm.Editor
                 if (spriteMat != null) sr.material = spriteMat;
                 sr.sortingOrder = 5;
 
-                // Scale (0.75 on x,y to fit full grid tile)
-                go.transform.localScale = new Vector3(0.75f, 0.75f, 1f);
+                // Scale (0.55 on x,y for compact, adorable conga-line followers)
+                go.transform.localScale = new Vector3(0.55f, 0.55f, 1f);
 
                 // Circle Collider 2D
                 CircleCollider2D col = go.AddComponent<CircleCollider2D>();

@@ -11,7 +11,7 @@ namespace StraySwarm.Gameplay
     {
         [Header("Tail Settings")]
         [Tooltip("How far apart each animal stands in the line.")]
-        [SerializeField] private float _followerSpacing = 0.6f;
+        [SerializeField] private float _followerSpacing = 0.42f;
         
         [Tooltip("How smoothly they snap to the path (higher = snappier).")]
         [SerializeField] private float _followSpeed = 25f; 
