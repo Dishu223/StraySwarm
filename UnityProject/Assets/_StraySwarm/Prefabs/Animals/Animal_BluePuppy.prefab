@@ -91,7 +91,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.95091575, y: 0.8688645}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -192,3 +192,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.FollowerBehavior
   _animalData: {fileID: 11400000, guid: 1b57f554b1d618544b6f1074e2b5735c, type: 2}
+  _overrideType: 0

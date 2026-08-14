@@ -13,7 +13,7 @@ namespace StraySwarm.Gameplay
         
         [Header("Level Design")]
         [Tooltip("The sequence of animal species vans for this level.")]
-        [SerializeField] private List<Data.AnimalType> _levelVanSequence = new List<Data.AnimalType> { Data.AnimalType.BluePuppy, Data.AnimalType.PinkKitten, Data.AnimalType.BluePuppy };
+        [SerializeField] private List<Data.AnimalType> _levelVanSequence = new List<Data.AnimalType> { Data.AnimalType.Puppy, Data.AnimalType.Kitten, Data.AnimalType.Puppy };
         
         private int _currentVanIndex = 0;
         private VanController _activeVan;

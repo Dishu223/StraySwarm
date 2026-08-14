@@ -10,7 +10,7 @@ namespace StraySwarm.Gameplay
     public class VanController : MonoBehaviour
     {
         [Header("Species Configuration")]
-        public AnimalType TargetAnimalType = AnimalType.BluePuppy;
+        public AnimalType TargetAnimalType = AnimalType.Puppy;
         public int Capacity = 3;
 
         [Header("Visual Feedback")]
