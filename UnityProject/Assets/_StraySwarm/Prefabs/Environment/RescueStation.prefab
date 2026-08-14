@@ -168,7 +168,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 359421862}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 746c109fa65e91340bbf9b794fdbfc7d, type: 3}
+  m_Script: {fileID: 11500000, guid: a1d8bc4ce694e3549b85b7c5e38a844b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.DeliveryCrate
   TargetAnimalType: 0
@@ -186,7 +186,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 359421862}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2f3922f32f319245842f1f0a2dfd666, type: 3}
+  m_Script: {fileID: 11500000, guid: 8fa2b7bfd2d08db4c8ccae0edb54c868, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.StationPulse
 --- !u!114 &359421871
