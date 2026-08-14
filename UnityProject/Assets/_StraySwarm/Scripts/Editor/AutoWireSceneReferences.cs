@@ -236,6 +236,54 @@ namespace StraySwarm.Editor
                 wiredCount++;
             }
 
+            // 9. Wire LevelBuilder
+            LevelBuilder lb = Object.FindAnyObjectByType<LevelBuilder>();
+            if (lb == null && gmGo != null)
+            {
+                lb = gmGo.AddComponent<LevelBuilder>();
+            }
+            if (lb != null)
+            {
+                SerializedObject so = new SerializedObject(lb);
+                string animalDir = "Assets/_StraySwarm/Prefabs/Animals";
+                string obstacleDir = "Assets/_StraySwarm/Prefabs/Obstacles";
+
+                GameObject puppy = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_BluePuppy.prefab");
+                GameObject kitten = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_PinkKitten.prefab");
+                GameObject frog = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_GreenFrog.prefab");
+                GameObject mouse = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_OrangeHamster.prefab");
+                GameObject pigeon = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_YellowPigeon.prefab");
+                GameObject bunny = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_PurpleBunny.prefab");
+
+                if (puppy != null) so.FindProperty("_puppyPrefab").objectReferenceValue = puppy;
+                if (kitten != null) so.FindProperty("_kittenPrefab").objectReferenceValue = kitten;
+                if (frog != null) so.FindProperty("_frogPrefab").objectReferenceValue = frog;
+                if (mouse != null) so.FindProperty("_mousePrefab").objectReferenceValue = mouse;
+                if (pigeon != null) so.FindProperty("_pigeonPrefab").objectReferenceValue = pigeon;
+                if (bunny != null) so.FindProperty("_bunnyPrefab").objectReferenceValue = bunny;
+
+                GameObject arrowUp = AssetDatabase.LoadAssetAtPath<GameObject>($"{obstacleDir}/OneWayArrow_Up.prefab");
+                GameObject arrowRight = AssetDatabase.LoadAssetAtPath<GameObject>($"{obstacleDir}/OneWayArrow_Right.prefab");
+                GameObject arrowDown = AssetDatabase.LoadAssetAtPath<GameObject>($"{obstacleDir}/OneWayArrow_Down.prefab");
+                GameObject arrowLeft = AssetDatabase.LoadAssetAtPath<GameObject>($"{obstacleDir}/OneWayArrow_Left.prefab");
+
+                if (arrowUp != null) so.FindProperty("_arrowUpPrefab").objectReferenceValue = arrowUp;
+                if (arrowRight != null) so.FindProperty("_arrowRightPrefab").objectReferenceValue = arrowRight;
+                if (arrowDown != null) so.FindProperty("_arrowDownPrefab").objectReferenceValue = arrowDown;
+                if (arrowLeft != null) so.FindProperty("_arrowLeftPrefab").objectReferenceValue = arrowLeft;
+
+                GameObject wall1 = AssetDatabase.LoadAssetAtPath<GameObject>($"{obstacleDir}/NumberedWall_1.prefab");
+                GameObject wall2 = AssetDatabase.LoadAssetAtPath<GameObject>($"{obstacleDir}/NumberedWall_2.prefab");
+                GameObject wall3 = AssetDatabase.LoadAssetAtPath<GameObject>($"{obstacleDir}/NumberedWall_3.prefab");
+
+                if (wall1 != null) so.FindProperty("_wall1Prefab").objectReferenceValue = wall1;
+                if (wall2 != null) so.FindProperty("_wall2Prefab").objectReferenceValue = wall2;
+                if (wall3 != null) so.FindProperty("_wall3Prefab").objectReferenceValue = wall3;
+
+                so.ApplyModifiedProperties();
+                wiredCount++;
+            }
+
             // Mark Scene Dirty and Save
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());

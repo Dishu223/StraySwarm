@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using StraySwarm.Data;
+using StraySwarm.Gameplay;
 
 namespace StraySwarm.Editor
 {
     /// <summary>
     /// Custom Unity Editor tool to generate 40 complete, balanced, handcrafted level ScriptableObjects across 2 worlds!
-    /// Access via top menu: Stray Swarm -> 🌟 Generate 40 Predefined Handcrafted Levels (2 Worlds)
+    /// Menu: Stray Swarm -> 🌟 Generate 40 Predefined Handcrafted Levels (2 Worlds)
     /// </summary>
     public static class CreatePredefinedLevels
     {
@@ -22,7 +23,6 @@ namespace StraySwarm.Editor
             string world1Path = Path.Combine(levelsPath, "World_01_Desert");
             string world2Path = Path.Combine(levelsPath, "World_02_Forest");
 
-            // Ensure directories exist
             EnsureDirectory(worldsPath);
             EnsureDirectory(world1Path);
             EnsureDirectory(world2Path);
@@ -57,26 +57,75 @@ namespace StraySwarm.Editor
                 level.TwoStarPercentage = 0.3f;
                 level.CoinReward = 30 + (i * 2);
 
-                // Progressive balance curve
+                // Clear lists
+                level.AnimalSpawns.Clear();
+                level.Stations.Clear();
+                level.OneWayArrows.Clear();
+                level.NumberedWalls.Clear();
+
+                // Handcrafted placements
                 if (i <= 5)
                 {
                     level.TimeLimit = 45f;
-                    level.VanSequence = new List<string> { "Blue", "Pink" };
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Puppy, GridPosition = new Vector2Int(3, 4), Capacity = 3 });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-1, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(0, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(1, 0) });
+                    if (i >= 3)
+                    {
+                        level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(0, -1) });
+                    }
                 }
                 else if (i <= 10)
                 {
                     level.TimeLimit = 60f;
-                    level.VanSequence = new List<string> { "Blue", "Pink", "Yellow" };
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Puppy, GridPosition = new Vector2Int(3, 4), Capacity = 3 });
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Kitten, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
+                    
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-2, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(2, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(-1, -1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(1, -1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(0, 1) });
+                    
+                    if (i >= 8)
+                    {
+                        level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Right, GridPosition = new Vector2Int(-1, 2) });
+                    }
                 }
                 else if (i <= 15)
                 {
                     level.TimeLimit = 75f;
-                    level.VanSequence = new List<string> { "Blue", "Pink", "Yellow", "Blue" };
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Puppy, GridPosition = new Vector2Int(3, 4), Capacity = 3 });
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Pigeon, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
+
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-2, -1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(2, -1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(-1, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(1, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(0, 2) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(0, -2) });
+
+                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Up, GridPosition = new Vector2Int(0, -1) });
+                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 2, GridPosition = new Vector2Int(1, 1) });
                 }
                 else
                 {
                     level.TimeLimit = 90f;
-                    level.VanSequence = new List<string> { "Blue", "Pink", "Yellow", "Pink", "Blue" };
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Puppy, GridPosition = new Vector2Int(3, 4), Capacity = 4 });
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Frog, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
+
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-2, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(2, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(-1, 1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(1, 1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(-1, -2) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(1, -2) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(0, 3) });
+
+                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Right, GridPosition = new Vector2Int(-1, 2) });
+                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Left, GridPosition = new Vector2Int(1, -1) });
+                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 3, GridPosition = new Vector2Int(0, 0) });
                 }
 
                 EditorUtility.SetDirty(level);
@@ -115,25 +164,58 @@ namespace StraySwarm.Editor
                 level.TwoStarPercentage = 0.3f;
                 level.CoinReward = 50 + (stageInWorld * 3);
 
+                level.AnimalSpawns.Clear();
+                level.Stations.Clear();
+                level.OneWayArrows.Clear();
+                level.NumberedWalls.Clear();
+
                 if (stageInWorld <= 5)
                 {
                     level.TimeLimit = 60f;
-                    level.VanSequence = new List<string> { "Green", "Orange", "Blue" };
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Frog, GridPosition = new Vector2Int(3, 4), Capacity = 3 });
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Mouse, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
+
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(-1, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(1, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Mouse, GridPosition = new Vector2Int(0, -1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Mouse, GridPosition = new Vector2Int(0, 1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-2, 2) });
+
+                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 2, GridPosition = new Vector2Int(0, 0) });
                 }
                 else if (stageInWorld <= 10)
                 {
                     level.TimeLimit = 75f;
-                    level.VanSequence = new List<string> { "Green", "Orange", "Purple", "Pink" };
-                }
-                else if (stageInWorld <= 15)
-                {
-                    level.TimeLimit = 90f;
-                    level.VanSequence = new List<string> { "Green", "Orange", "Purple", "Yellow", "Blue" };
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Frog, GridPosition = new Vector2Int(3, 4), Capacity = 3 });
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Bunny, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
+
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(-2, -1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Mouse, GridPosition = new Vector2Int(2, -1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Bunny, GridPosition = new Vector2Int(0, 2) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Bunny, GridPosition = new Vector2Int(-1, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(1, 0) });
+
+                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Up, GridPosition = new Vector2Int(0, 1) });
+                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 3, GridPosition = new Vector2Int(-1, -1) });
                 }
                 else
                 {
-                    level.TimeLimit = 100f;
-                    level.VanSequence = new List<string> { "Green", "Orange", "Purple", "Yellow", "Pink", "Blue" };
+                    level.TimeLimit = 95f;
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Bunny, GridPosition = new Vector2Int(3, 4), Capacity = 4 });
+                    level.Stations.Add(new StationSpawnEntry { TargetType = AnimalType.Mouse, GridPosition = new Vector2Int(-3, 4), Capacity = 3 });
+
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Puppy, GridPosition = new Vector2Int(-2, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Kitten, GridPosition = new Vector2Int(2, 0) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Frog, GridPosition = new Vector2Int(-1, 1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Mouse, GridPosition = new Vector2Int(1, 1) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Pigeon, GridPosition = new Vector2Int(-1, -2) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Bunny, GridPosition = new Vector2Int(1, -2) });
+                    level.AnimalSpawns.Add(new AnimalSpawnEntry { Type = AnimalType.Bunny, GridPosition = new Vector2Int(0, 3) });
+
+                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Right, GridPosition = new Vector2Int(-1, 2) });
+                    level.OneWayArrows.Add(new OneWayArrowSpawnEntry { Direction = ArrowDirection.Down, GridPosition = new Vector2Int(1, 2) });
+                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 3, GridPosition = new Vector2Int(0, 0) });
+                    level.NumberedWalls.Add(new NumberedWallSpawnEntry { HitPoints = 2, GridPosition = new Vector2Int(0, -1) });
                 }
 
                 EditorUtility.SetDirty(level);
@@ -144,8 +226,8 @@ namespace StraySwarm.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"🎉 [CreatePredefinedLevels] Successfully generated 40 Handcrafted Levels across 2 Worlds!\n- World 1: Desert Oasis (20 levels)\n- World 2: Whispering Forest (20 levels, unlocked at 30 stars)");
-            EditorUtility.DisplayDialog("Stray Swarm", "Successfully generated 40 Predefined Handcrafted Level assets across 2 Worlds!\n\nCheck Assets/_StraySwarm/Data/Levels/ and Assets/_StraySwarm/Data/Worlds/.", "Awesome!");
+            Debug.Log($"🎉 [CreatePredefinedLevels] Successfully generated 40 Handcrafted Levels across 2 Worlds with complete animal, station, and obstacle placements!");
+            EditorUtility.DisplayDialog("Stray Swarm", "Successfully generated 40 Predefined Handcrafted Level assets across 2 Worlds!\n\nAll animals, delivery stations, one-way arrows, and breakable walls are configured!", "Awesome!");
         }
 
         private static void EnsureDirectory(string path)

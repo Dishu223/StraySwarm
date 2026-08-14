@@ -1018,7 +1018,7 @@ MonoBehaviour:
   _followerSpacing: 0.6
   _followSpeed: 25
   _deliveryStaggerDelay: 0.08
-  _pathHistory: {fileID: 0}
+  _pathHistory: {fileID: 350723422}
 --- !u!114 &350723422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1269,9 +1269,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.RescueStation
   VanParkingSpot: {fileID: 956666070}
-  _attachedCrate: {fileID: 0}
-  _vanQueue: {fileID: 0}
-  _tailManager: {fileID: 0}
+  _attachedCrate: {fileID: 359421868}
+  _vanQueue: {fileID: 359421866}
+  _tailManager: {fileID: 350723421}
 --- !u!114 &359421866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1284,7 +1284,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0625d8226ce38e848be236852a546c1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.VanQueue
-  _station: {fileID: 0}
+  _station: {fileID: 359421865}
   _vanPrefab: {fileID: 1271426512251005051, guid: e40ea8c36bddb1440bfacace8920d743, type: 3}
   _levelVanSequence: 000000000000000000000000
 --- !u!61 &359421867
@@ -1347,7 +1347,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.DeliveryCrate
   TargetAnimalType: 0
   Capacity: 3
-  _crateRenderer: {fileID: 0}
+  _crateRenderer: {fileID: 359421863}
   _openCrateSprite: {fileID: 0}
   _fullCrateSprite: {fileID: 0}
   _colorBanner: {fileID: 0}
@@ -4319,7 +4319,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b6408e7f4f9f52418f9400b653cb87a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Core.GameManager
-  _currentLevel: {fileID: 11400000, guid: 577fd203cd5c2d84fbca804dc398a70f, type: 2}
+  _currentLevel: {fileID: 11400000, guid: f97816273491ed042b0d26c981320551, type: 2}
   _currentLevelIndex: 0
   _onLevelWonEvent: {fileID: 11400000, guid: 96142ac1618ca2f44aa4a8cf7a6c902b, type: 2}
   _onLevelLostEvent: {fileID: 11400000, guid: d624edf64f4c22a499c18bb712ebc1bd, type: 2}
@@ -4851,9 +4851,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Audio.AudioManager
   CollectSound: {fileID: 8300000, guid: 578b200e3bdd1bc488089899f6ca3727, type: 3}
-  DeliverSound: {fileID: 8300000, guid: c181199eb27ab5f4b82b4cfa50e370ec, type: 3}
-  CrateFullSound: {fileID: 0}
-  WallBreakSound: {fileID: 0}
+  DeliverSound: {fileID: 8300000, guid: 0df888337dbc99b4f8f541a05dc61cd0, type: 3}
+  CrateFullSound: {fileID: 8300000, guid: 8a119311f4a80cc41baa5c5dc331019b, type: 3}
+  WallBreakSound: {fileID: 8300000, guid: c6dbcf44aa001524793c91258dd2742a, type: 3}
   Star1Sound: {fileID: 8300000, guid: 0df888337dbc99b4f8f541a05dc61cd0, type: 3}
   Star2Sound: {fileID: 8300000, guid: 0df888337dbc99b4f8f541a05dc61cd0, type: 3}
   Star3Sound: {fileID: 8300000, guid: 3562dce481c7b8b41aae2ca7104f0e4b, type: 3}
@@ -4861,7 +4861,7 @@ MonoBehaviour:
   LoseSound: {fileID: 8300000, guid: c6dbcf44aa001524793c91258dd2742a, type: 3}
   ButtonClickSound: {fileID: 8300000, guid: 621a8d78116b7cd4c870d188bbd97f9e, type: 3}
   TimerWarningSound: {fileID: 0}
-  MenuBGM: {fileID: 8300000, guid: 7fc849ee434d88d4daa481772a78117b, type: 3}
+  MenuBGM: {fileID: 8300000, guid: 83f697ab52febd747869e76108c8f475, type: 3}
   GameplayBGM: {fileID: 8300000, guid: 83f697ab52febd747869e76108c8f475, type: 3}
   MasterVolume: 1
   SFXVolume: 1
@@ -5007,7 +5007,7 @@ MonoBehaviour:
   - {fileID: 598436285}
   _normalTimerColor: {r: 0.6320754, g: 0.2018136, b: 0.062611245, a: 1}
   _warningTimerColor: {r: 1, g: 0, b: 0, a: 1}
-  _gameManager: {fileID: 0}
+  _gameManager: {fileID: 1463483354}
 --- !u!1 &2102277396
 GameObject:
   m_ObjectHideFlags: 0

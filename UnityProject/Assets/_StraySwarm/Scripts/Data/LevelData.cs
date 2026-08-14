@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using StraySwarm.Gameplay;
 
 namespace StraySwarm.Data
 {
@@ -19,6 +20,20 @@ namespace StraySwarm.Data
         public int Capacity = 3;
     }
 
+    [Serializable]
+    public class OneWayArrowSpawnEntry
+    {
+        public ArrowDirection Direction;
+        public Vector2Int GridPosition;
+    }
+
+    [Serializable]
+    public class NumberedWallSpawnEntry
+    {
+        public int HitPoints = 3;
+        public Vector2Int GridPosition;
+    }
+
     /// <summary>
     /// ScriptableObject defining the complete, handcrafted layout, objectives, and thresholds of a single level.
     /// </summary>
@@ -29,6 +44,9 @@ namespace StraySwarm.Data
         public int LevelID = 1;
         public string LevelName = "Level 1";
         public WorldTheme World = WorldTheme.Desert;
+
+        [Header("Player Start Position")]
+        public Vector2Int PlayerStartCell = new Vector2Int(0, 0);
 
         [Header("Timing & Star Thresholds")]
         [Tooltip("Total time in seconds to beat the level.")]
@@ -48,6 +66,10 @@ namespace StraySwarm.Data
 
         [Header("Stations (Fixed Placements)")]
         public List<StationSpawnEntry> Stations = new List<StationSpawnEntry>();
+
+        [Header("Obstacles (Fixed Placements)")]
+        public List<OneWayArrowSpawnEntry> OneWayArrows = new List<OneWayArrowSpawnEntry>();
+        public List<NumberedWallSpawnEntry> NumberedWalls = new List<NumberedWallSpawnEntry>();
 
         [Header("Legacy Van Support")]
         public List<string> VanSequence = new List<string>();
