@@ -67,20 +67,14 @@ namespace StraySwarm.Editor
                 }
 
                 // Cube Wobble
-                CubeWobble wobble = go.AddComponent<CubeWobble>();
-                wobble.EnableIdleBob = true;
-                wobble.IdleSpeed = 3f;
-                wobble.IdleScaleAmount = 0.04f;
+                go.AddComponent<CubeWobble>();
 
                 // Basket Bounce
                 BasketBounce bounce = go.AddComponent<BasketBounce>();
                 bounce.enabled = false; // Enabled only when collected!
 
                 // Drop Shadow
-                DropShadow shadow = go.AddComponent<DropShadow>();
-                shadow.Offset = new Vector2(0f, -0.3f);
-                shadow.ShadowScale = new Vector2(0.8f, 0.3f);
-                shadow.Alpha = 0.25f;
+                go.AddComponent<DropShadow>();
 
                 // Save Prefab
                 PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
