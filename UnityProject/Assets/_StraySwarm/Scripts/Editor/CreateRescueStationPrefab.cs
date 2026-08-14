@@ -58,23 +58,19 @@ namespace StraySwarm.Editor
             // 8. Add GridSnap for clean path center snapping
             root.AddComponent<GridSnap>();
 
-            // Save Prefab in both Environment and Prefabs root for convenience
+            // Save Prefab cleanly in Environment folder
             string envPath = $"{envDir}/RescueStation.prefab";
-            string rootPath = $"{prefabsDir}/RescueStation.prefab";
 
             PrefabUtility.SaveAsPrefabAsset(root, envPath);
-            PrefabUtility.SaveAsPrefabAsset(root, rootPath);
-
             Object.DestroyImmediate(root);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"🏠 [CreateRescueStationPrefab] Successfully created {envPath} & {rootPath}!");
+            Debug.Log($"🏠 [CreateRescueStationPrefab] Successfully created {envPath}!");
             EditorUtility.DisplayDialog("Rescue Station Prefab Created!", 
                 $"RescueStation.prefab is now ready in:\n\n" +
-                $"• Assets/_StraySwarm/Prefabs/Environment/RescueStation.prefab\n" +
-                $"• Assets/_StraySwarm/Prefabs/RescueStation.prefab\n\n" +
+                $"Assets/_StraySwarm/Prefabs/Environment/RescueStation.prefab\n\n" +
                 $"You can now drag it directly onto your level drop-off point!", "Awesome!");
         }
     }
