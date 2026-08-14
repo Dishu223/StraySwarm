@@ -4,12 +4,16 @@ using System.Collections;
 namespace StraySwarm.Gameplay
 {
     /// <summary>
-    /// Represents the delivery truck that accepts a specific color of animal.
+    /// Represents the delivery truck that accepts a specific animal species (Puppy, Kitten, etc.).
     /// </summary>
     public class VanController : MonoBehaviour
     {
-        public string RequiredColor = "Blue";
+        [Header("Species Configuration")]
+        public AnimalType TargetAnimalType = AnimalType.BluePuppy;
         public int Capacity = 3;
+
+        [Header("Visual Feedback")]
+        [SerializeField] private SpriteRenderer _targetAnimalIcon;
         
         public bool IsFull => _currentLoad >= Capacity;
         public bool IsDrivingAway { get; private set; } = false;
@@ -22,12 +26,23 @@ namespace StraySwarm.Gameplay
             IsParked = true;
         }
 
+        public void SetTargetAnimal(AnimalType type, Sprite icon = null)
+        {
+            TargetAnimalType = type;
+            if (_targetAnimalIcon != null && icon != null)
+            {
+                _targetAnimalIcon.sprite = icon;
+                _targetAnimalIcon.color = Color.white;
+            }
+        }
+
         public bool TryAcceptAnimal(FollowerBehavior animal)
         {
             // Only accept animals if the van is fully parked and not full/driving away!
-            if (!IsParked || IsFull || IsDrivingAway) return false;
+            if (!IsParked || IsFull || IsDrivingAway || animal == null) return false;
             
-            if (animal.AnimalColor == RequiredColor)
+            bool isMatch = animal.AnimalType == TargetAnimalType || (animal.Data != null && animal.Data.Type == TargetAnimalType);
+            if (isMatch)
             {
                 _currentLoad++;
                 

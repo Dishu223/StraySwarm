@@ -12,10 +12,6 @@ namespace StraySwarm.Gameplay
         [Header("Data Configuration")]
         [SerializeField] private AnimalData _animalData;
 
-        [Header("Legacy Fallback")]
-        [Tooltip("Color tag for prototyping (e.g. 'Blue', 'Pink')")]
-        public string AnimalColor = "Blue";
-
         public bool IsCollected { get; private set; } = false;
         public AnimalData Data => _animalData;
         public AnimalType AnimalType => _animalData != null ? _animalData.Type : AnimalType.BluePuppy;

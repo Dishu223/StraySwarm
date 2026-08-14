@@ -12,8 +12,8 @@ namespace StraySwarm.Gameplay
         [SerializeField] private GameObject _vanPrefab; 
         
         [Header("Level Design")]
-        [Tooltip("The sequence of vans for this level.")]
-        [SerializeField] private List<string> _levelVanSequence = new List<string> { "Blue", "Pink", "Blue" };
+        [Tooltip("The sequence of animal species vans for this level.")]
+        [SerializeField] private List<Data.AnimalType> _levelVanSequence = new List<Data.AnimalType> { Data.AnimalType.BluePuppy, Data.AnimalType.PinkKitten, Data.AnimalType.BluePuppy };
         
         private int _currentVanIndex = 0;
         private VanController _activeVan;
@@ -44,7 +44,7 @@ namespace StraySwarm.Gameplay
                 return;
             }
 
-            string nextColor = _levelVanSequence[_currentVanIndex];
+            Data.AnimalType nextType = _levelVanSequence[_currentVanIndex];
             _currentVanIndex++;
 
             // Spawn the van off-screen to the left, and drive it to the parking spot
@@ -52,7 +52,7 @@ namespace StraySwarm.Gameplay
             GameObject vanObj = Instantiate(_vanPrefab, spawnPos, Quaternion.identity);
             
             _activeVan = vanObj.GetComponent<VanController>();
-            _activeVan.RequiredColor = nextColor;
+            _activeVan.SetTargetAnimal(nextType);
             
             // For testing, just need 2 animals to fill a van
             _activeVan.Capacity = 2; 

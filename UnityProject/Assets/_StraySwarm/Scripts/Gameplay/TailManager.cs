@@ -155,9 +155,14 @@ namespace StraySwarm.Gameplay
             List<FollowerBehavior> matchingAnimals = new List<FollowerBehavior>();
             for (int i = 0; i < _tail.Count; i++)
             {
-                if (_tail[i].AnimalColor == van.RequiredColor)
+                var animal = _tail[i];
+                if (animal != null)
                 {
-                    matchingAnimals.Add(_tail[i]);
+                    bool isMatch = animal.AnimalType == van.TargetAnimalType || (animal.Data != null && animal.Data.Type == van.TargetAnimalType);
+                    if (isMatch)
+                    {
+                        matchingAnimals.Add(animal);
+                    }
                 }
             }
 
