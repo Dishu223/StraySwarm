@@ -8,7 +8,7 @@ using StraySwarm.Gameplay;
 namespace StraySwarm.Editor
 {
     /// <summary>
-    /// Custom Unity Editor tool to generate all 6 animal prefabs with 1 click!
+    /// Custom Unity Editor tool to generate all 6 clean animal prefabs with 1 click!
     /// Menu: Stray Swarm -> 🐾 Generate 6 Animal Prefabs
     /// </summary>
     public static class CreateAnimalPrefabs
@@ -23,7 +23,7 @@ namespace StraySwarm.Editor
             }
 
             string dataDir = "Assets/_StraySwarm/Data/Animals";
-            string[] animalNames = { "BluePuppy", "PinkKitten", "YellowPigeon", "GreenFrog", "OrangeHamster", "PurpleBunny" };
+            string[] animalNames = { "Puppy", "Kitten", "Frog", "Mouse", "Pigeon", "Bunny" };
 
             // Find default high-res cube sprite
             Sprite defaultSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Placeholders/RoundedCube.png");
@@ -47,7 +47,7 @@ namespace StraySwarm.Editor
                 if (data != null && data.WorldSprite != null) sr.sprite = data.WorldSprite;
                 else sr.sprite = defaultSprite;
 
-                if (data != null) sr.color = data.PrimaryColor;
+                sr.color = Color.white; // Keep pure custom artwork colors!
                 if (spriteMat != null) sr.material = spriteMat;
                 sr.sortingOrder = 5;
 
@@ -59,16 +59,6 @@ namespace StraySwarm.Editor
                 col.isTrigger = true;
                 col.radius = 0.5f;
 
-                // Cube Wobble
-                CubeWobble wobble = go.AddComponent<CubeWobble>();
-
-                // Basket Bounce
-                BasketBounce basket = go.AddComponent<BasketBounce>();
-                basket.enabled = false; // Enabled upon collection
-
-                // Drop Shadow
-                DropShadow shadow = go.AddComponent<DropShadow>();
-
                 // Follower Behavior
                 FollowerBehavior follower = go.AddComponent<FollowerBehavior>();
                 if (data != null)
@@ -76,17 +66,42 @@ namespace StraySwarm.Editor
                     follower.SetAnimalData(data);
                 }
 
-                // Save as Prefab
+                // Cube Wobble
+                CubeWobble wobble = go.AddComponent<CubeWobble>();
+                wobble.EnableIdleBob = true;
+                wobble.IdleSpeed = 3f;
+                wobble.IdleScaleAmount = 0.04f;
+
+                // Basket Bounce
+                BasketBounce bounce = go.AddComponent<BasketBounce>();
+                bounce.enabled = false; // Enabled only when collected!
+
+                // Drop Shadow
+                DropShadow shadow = go.AddComponent<DropShadow>();
+                shadow.Offset = new Vector2(0f, -0.3f);
+                shadow.ShadowScale = new Vector2(0.8f, 0.3f);
+                shadow.Alpha = 0.25f;
+
+                // Save Prefab
                 PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
-                GameObject.DestroyImmediate(go);
+
+                // Also save legacy compatibility alias if needed
+                if (name == "Puppy") PrefabUtility.SaveAsPrefabAsset(go, $"{prefabDir}/Animal_BluePuppy.prefab");
+                if (name == "Kitten") PrefabUtility.SaveAsPrefabAsset(go, $"{prefabDir}/Animal_PinkKitten.prefab");
+                if (name == "Frog") PrefabUtility.SaveAsPrefabAsset(go, $"{prefabDir}/Animal_GreenFrog.prefab");
+                if (name == "Mouse") PrefabUtility.SaveAsPrefabAsset(go, $"{prefabDir}/Animal_OrangeHamster.prefab");
+                if (name == "Pigeon") PrefabUtility.SaveAsPrefabAsset(go, $"{prefabDir}/Animal_YellowPigeon.prefab");
+                if (name == "Bunny") PrefabUtility.SaveAsPrefabAsset(go, $"{prefabDir}/Animal_PurpleBunny.prefab");
+
+                Object.DestroyImmediate(go);
                 createdCount++;
             }
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"🎉 [CreateAnimalPrefabs] Successfully created {createdCount} Animal Prefabs in {prefabDir}!");
-            EditorUtility.DisplayDialog("Stray Swarm", $"Successfully generated {createdCount} Animal Prefabs!\n\nCheck Assets/_StraySwarm/Prefabs/Animals/.", "Awesome!");
+            Debug.Log($"🐾 [CreateAnimalPrefabs] Successfully generated {createdCount} animal prefabs in {prefabDir}!");
+            EditorUtility.DisplayDialog("Stray Swarm", $"Successfully generated all 6 animal prefabs (Puppy, Kitten, Frog, Mouse, Pigeon, Bunny) at 0.75 tile scale!", "Awesome!");
         }
     }
 }

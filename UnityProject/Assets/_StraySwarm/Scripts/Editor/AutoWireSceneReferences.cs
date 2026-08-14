@@ -301,12 +301,23 @@ namespace StraySwarm.Editor
                 SerializedObject so = new SerializedObject(ws);
                 string animalDir = "Assets/_StraySwarm/Prefabs/Animals";
 
-                GameObject puppy = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_BluePuppy.prefab");
-                GameObject kitten = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_PinkKitten.prefab");
-                GameObject frog = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_GreenFrog.prefab");
-                GameObject mouse = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_OrangeHamster.prefab");
-                GameObject pigeon = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_YellowPigeon.prefab");
-                GameObject bunny = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_PurpleBunny.prefab");
+                GameObject puppy = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_Puppy.prefab");
+                if (puppy == null) puppy = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_BluePuppy.prefab");
+
+                GameObject kitten = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_Kitten.prefab");
+                if (kitten == null) kitten = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_PinkKitten.prefab");
+
+                GameObject frog = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_Frog.prefab");
+                if (frog == null) frog = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_GreenFrog.prefab");
+
+                GameObject mouse = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_Mouse.prefab");
+                if (mouse == null) mouse = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_OrangeHamster.prefab");
+
+                GameObject pigeon = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_Pigeon.prefab");
+                if (pigeon == null) pigeon = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_YellowPigeon.prefab");
+
+                GameObject bunny = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_Bunny.prefab");
+                if (bunny == null) bunny = AssetDatabase.LoadAssetAtPath<GameObject>($"{animalDir}/Animal_PurpleBunny.prefab");
 
                 if (puppy != null) so.FindProperty("_puppyPrefab").objectReferenceValue = puppy;
                 if (kitten != null) so.FindProperty("_kittenPrefab").objectReferenceValue = kitten;

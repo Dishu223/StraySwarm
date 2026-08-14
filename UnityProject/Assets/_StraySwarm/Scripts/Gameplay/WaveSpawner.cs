@@ -181,14 +181,9 @@ namespace StraySwarm.Gameplay
             while (_liveAnimalsOnMap.Count < _maxConcurrentOnMap && _scheduledQueue.Count > 0)
             {
                 ScheduledWaveSpawn nextSpawn = _scheduledQueue.Peek();
-                int targetIndex = Mathf.Clamp(nextSpawn.SpawnPointIndex, 0, _spawnPoints.Count - 1);
-                AnimalSpawnPoint targetPoint = _spawnPoints[targetIndex];
-
-                // If scheduled point is occupied or player is right on it, find next open point
-                if (targetPoint.IsOccupied || Vector3.Distance(targetPoint.transform.position, playerPos) <= 1.2f)
-                {
-                    targetPoint = _spawnPoints.FirstOrDefault(sp => !sp.IsOccupied && Vector3.Distance(sp.transform.position, playerPos) > 1.2f);
-                }
+                
+                // Find the best clustered spawn point adjacent to matching species!
+                AnimalSpawnPoint targetPoint = FindBestClusteredSpawnPoint(nextSpawn.Type, playerPos);
 
                 if (targetPoint == null || targetPoint.IsOccupied)
                 {
@@ -212,6 +207,31 @@ namespace StraySwarm.Gameplay
                     _totalSpawned++;
                 }
             }
+        }
+
+        private AnimalSpawnPoint FindBestClusteredSpawnPoint(AnimalType type, Vector3 playerPos)
+        {
+            // 1. Check if an animal of the SAME species is already alive on the map
+            var sameTypeAnimals = _liveAnimalsOnMap
+                .Where(a => a != null && !a.IsCollected && a.AnimalType == type)
+                .ToList();
+
+            if (sameTypeAnimals.Count > 0)
+            {
+                // Find unoccupied spawn point closest to any existing animal of the same species!
+                AnimalSpawnPoint closestNeighbor = _spawnPoints
+                    .Where(sp => !sp.IsOccupied && Vector3.Distance(sp.transform.position, playerPos) > 1.2f)
+                    .OrderBy(sp => sameTypeAnimals.Min(a => Vector3.Distance(sp.transform.position, a.transform.position)))
+                    .FirstOrDefault();
+
+                if (closestNeighbor != null)
+                {
+                    return closestNeighbor;
+                }
+            }
+
+            // 2. Otherwise pick an unoccupied spawn point that is not near the player
+            return _spawnPoints.FirstOrDefault(sp => !sp.IsOccupied && Vector3.Distance(sp.transform.position, playerPos) > 1.2f);
         }
 
         private Vector3 GetPlayerPosition()

@@ -9,15 +9,7 @@ namespace StraySwarm.Data
         Frog = 2,
         Mouse = 3,
         Pigeon = 4,
-        Bunny = 5,
-
-        // Legacy compatibility aliases
-        BluePuppy = 0,
-        PinkKitten = 1,
-        GreenFrog = 2,
-        OrangeHamster = 3,
-        YellowPigeon = 4,
-        PurpleBunny = 5
+        Bunny = 5
     }
 
     /// <summary>
