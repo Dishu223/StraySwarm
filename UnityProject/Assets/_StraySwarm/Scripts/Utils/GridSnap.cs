@@ -22,8 +22,8 @@ namespace StraySwarm.Utils
 
         public void SnapToPathCenter()
         {
-            Tilemap tilemap = Object.FindAnyObjectByType<Tilemap>();
-            if (tilemap != null)
+            Tilemap tilemap = GetComponentInParent<Tilemap>() ?? Object.FindAnyObjectByType<Tilemap>();
+            if (tilemap != null && tilemap.tileAnchor.x > 0.1f)
             {
                 Vector3Int cell = tilemap.WorldToCell(transform.position);
                 Vector3 center = tilemap.GetCellCenterWorld(cell);
@@ -31,13 +31,10 @@ namespace StraySwarm.Utils
             }
             else
             {
-                Grid grid = Object.FindAnyObjectByType<Grid>();
-                if (grid != null)
-                {
-                    Vector3Int cell = grid.WorldToCell(transform.position);
-                    Vector3 center = grid.GetCellCenterWorld(cell);
-                    transform.position = new Vector3(center.x, center.y, transform.position.z);
-                }
+                // Standard cell center: (Floor(x) + 0.5, Floor(y) + 0.5)
+                float cx = Mathf.Floor(transform.position.x) + 0.5f;
+                float cy = Mathf.Floor(transform.position.y) + 0.5f;
+                transform.position = new Vector3(cx, cy, transform.position.z);
             }
         }
     }
