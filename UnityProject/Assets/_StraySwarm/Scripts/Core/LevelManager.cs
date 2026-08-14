@@ -38,9 +38,9 @@ namespace StraySwarm.Core
 
         public void RebuildFlatPlaylist()
         {
+            _levelPlaylist.Clear();
             if (_worlds != null && _worlds.Count > 0)
             {
-                _levelPlaylist.Clear();
                 foreach (var world in _worlds)
                 {
                     if (world != null && world.Levels != null)
@@ -49,6 +49,22 @@ namespace StraySwarm.Core
                     }
                 }
             }
+
+#if UNITY_EDITOR
+            if (_levelPlaylist.Count == 0)
+            {
+                string[] guids = UnityEditor.AssetDatabase.FindAssets("t:LevelData", new[] { "Assets/_StraySwarm/Data/Levels" });
+                List<LevelData> found = new List<LevelData>();
+                foreach (string guid in guids)
+                {
+                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                    LevelData ld = UnityEditor.AssetDatabase.LoadAssetAtPath<LevelData>(path);
+                    if (ld != null && !found.Contains(ld)) found.Add(ld);
+                }
+                found.Sort((a, b) => a.LevelID.CompareTo(b.LevelID));
+                _levelPlaylist.AddRange(found);
+            }
+#endif
         }
 
         public LevelData GetCurrentLevelData()

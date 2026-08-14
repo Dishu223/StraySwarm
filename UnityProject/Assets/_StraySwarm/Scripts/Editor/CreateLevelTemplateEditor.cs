@@ -144,33 +144,6 @@ namespace StraySwarm.Editor
             data.AllowedAnimalTypes = allowed;
 
             AssetDatabase.CreateAsset(data, dataPath);
-
-            // 3. Register with LevelManager if present
-            LevelManager lm = FindAnyObjectByType<LevelManager>();
-            if (lm != null)
-            {
-                SerializedObject so = new SerializedObject(lm);
-                SerializedProperty playlistProp = so.FindProperty("_levelPlaylist");
-                if (playlistProp != null)
-                {
-                    bool exists = false;
-                    for (int i = 0; i < playlistProp.arraySize; i++)
-                    {
-                        if (playlistProp.GetArrayElementAtIndex(i).objectReferenceValue == data)
-                        {
-                            exists = true;
-                            break;
-                        }
-                    }
-                    if (!exists)
-                    {
-                        playlistProp.arraySize++;
-                        playlistProp.GetArrayElementAtIndex(playlistProp.arraySize - 1).objectReferenceValue = data;
-                        so.ApplyModifiedProperties();
-                    }
-                }
-            }
-
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
