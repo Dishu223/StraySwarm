@@ -27,14 +27,13 @@ namespace StraySwarm.Gameplay
             if (tilemap != null)
             {
                 Vector3Int cell = tilemap.WorldToCell(transform.position);
-                Vector3 center = tilemap.GetCellCenterWorld(cell);
-                transform.position = new Vector3(center.x, center.y, 0f);
+                Vector3 pos = tilemap.CellToWorld(cell);
+                transform.position = new Vector3(pos.x, pos.y, 0f);
             }
             else
             {
-                // Standard cell center: (Floor(x) + 0.5, Floor(y) + 0.5)
-                float cx = Mathf.Floor(transform.position.x) + 0.5f;
-                float cy = Mathf.Floor(transform.position.y) + 0.5f;
+                float cx = Mathf.Round(transform.position.x);
+                float cy = Mathf.Round(transform.position.y);
                 transform.position = new Vector3(cx, cy, 0f);
             }
         }

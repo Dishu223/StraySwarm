@@ -30,16 +30,16 @@ namespace StraySwarm.Editor
             // Helper lambda to get path center
             Vector3 GetPathCenter(Vector3 worldPos)
             {
-                if (tilemap != null && tilemap.tileAnchor.x > 0.1f)
+                if (tilemap != null)
                 {
                     Vector3Int cell = tilemap.WorldToCell(worldPos);
-                    Vector3 c = tilemap.GetCellCenterWorld(cell);
+                    Vector3 c = tilemap.CellToWorld(cell);
                     return new Vector3(c.x, c.y, worldPos.z);
                 }
                 else
                 {
-                    float cx = Mathf.Floor(worldPos.x) + 0.5f;
-                    float cy = Mathf.Floor(worldPos.y) + 0.5f;
+                    float cx = Mathf.Round(worldPos.x);
+                    float cy = Mathf.Round(worldPos.y);
                     return new Vector3(cx, cy, worldPos.z);
                 }
             }

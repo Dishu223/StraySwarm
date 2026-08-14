@@ -17,7 +17,6 @@ namespace StraySwarm.Editor
         public static void GenerateStationPrefab()
         {
             string envDir = "Assets/_StraySwarm/Prefabs/Environment";
-            string prefabsDir = "Assets/_StraySwarm/Prefabs";
 
             if (!Directory.Exists(envDir)) Directory.CreateDirectory(envDir);
 
