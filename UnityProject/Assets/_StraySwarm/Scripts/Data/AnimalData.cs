@@ -4,12 +4,20 @@ namespace StraySwarm.Data
 {
     public enum AnimalType
     {
-        BluePuppy,
-        PinkKitten,
-        YellowPigeon,
-        GreenFrog,
-        OrangeHamster,
-        PurpleBunny
+        Puppy = 0,
+        Kitten = 1,
+        Frog = 2,
+        Mouse = 3,
+        Pigeon = 4,
+        Bunny = 5,
+
+        // Legacy compatibility aliases
+        BluePuppy = 0,
+        PinkKitten = 1,
+        GreenFrog = 2,
+        OrangeHamster = 3,
+        YellowPigeon = 4,
+        PurpleBunny = 5
     }
 
     /// <summary>

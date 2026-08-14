@@ -17,12 +17,12 @@ namespace StraySwarm.Editor
                 Directory.CreateDirectory(folderPath);
             }
 
-            CreateOrUpdateAsset(AnimalType.BluePuppy, "Blue Puppy", new Color(0.36f, 0.72f, 1f), folderPath);
-            CreateOrUpdateAsset(AnimalType.PinkKitten, "Pink Kitten", new Color(1f, 0.49f, 0.7f), folderPath);
-            CreateOrUpdateAsset(AnimalType.YellowPigeon, "Yellow Pigeon", new Color(1f, 0.8f, 0.01f), folderPath);
-            CreateOrUpdateAsset(AnimalType.GreenFrog, "Green Frog", new Color(0.49f, 0.85f, 0.62f), folderPath);
-            CreateOrUpdateAsset(AnimalType.OrangeHamster, "Orange Hamster", new Color(1f, 0.62f, 0.26f), folderPath);
-            CreateOrUpdateAsset(AnimalType.PurpleBunny, "Purple Bunny", new Color(0.64f, 0.61f, 1f), folderPath);
+            CreateOrUpdateAsset(AnimalType.Puppy, "Puppy", new Color(0.36f, 0.72f, 1f), folderPath);
+            CreateOrUpdateAsset(AnimalType.Kitten, "Kitten", new Color(1f, 0.49f, 0.7f), folderPath);
+            CreateOrUpdateAsset(AnimalType.Pigeon, "Pigeon", new Color(1f, 0.8f, 0.01f), folderPath);
+            CreateOrUpdateAsset(AnimalType.Frog, "Frog", new Color(0.49f, 0.85f, 0.62f), folderPath);
+            CreateOrUpdateAsset(AnimalType.Mouse, "Mouse", new Color(1f, 0.62f, 0.26f), folderPath);
+            CreateOrUpdateAsset(AnimalType.Bunny, "Bunny", new Color(0.64f, 0.61f, 1f), folderPath);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using StraySwarm.Data;
 
 namespace StraySwarm.Gameplay
 {
