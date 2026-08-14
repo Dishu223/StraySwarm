@@ -6,6 +6,13 @@ using StraySwarm.Gameplay;
 namespace StraySwarm.Data
 {
     [Serializable]
+    public class ScheduledWaveSpawn
+    {
+        public int SpawnPointIndex;
+        public AnimalType Type;
+    }
+
+    [Serializable]
     public class AnimalSpawnEntry
     {
         public AnimalType Type;
@@ -36,7 +43,7 @@ namespace StraySwarm.Data
 
     /// <summary>
     /// ScriptableObject defining the complete, handcrafted layout, objectives, and thresholds of a single level.
-    /// Supports both dynamic wave spawning and fixed handcrafted entity placements.
+    /// Supports deterministic wave schedules, fixed entity placements, and dynamic progression.
     /// </summary>
     [CreateAssetMenu(fileName = "LevelData_01", menuName = "Stray Swarm/Level Data")]
     public class LevelData : ScriptableObject
@@ -58,6 +65,10 @@ namespace StraySwarm.Data
 
         [Tooltip("Seed offset for deterministic reproduction (defaults to LevelID * 1000).")]
         public int SeedOffset = 0;
+
+        [Header("Fixed Wave Schedule (Optional Handcrafted Sequence)")]
+        [Tooltip("If populated, the level will follow this exact pre-determined sequence of (SpawnPointIndex, AnimalType) on every playthrough.")]
+        public List<ScheduledWaveSpawn> FixedWaveSchedule = new List<ScheduledWaveSpawn>();
 
         [Header("Player Start Position")]
         public Vector2Int PlayerStartCell = new Vector2Int(0, 0);

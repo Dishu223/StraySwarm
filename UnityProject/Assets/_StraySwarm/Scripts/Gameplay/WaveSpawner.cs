@@ -8,7 +8,7 @@ namespace StraySwarm.Gameplay
 {
     /// <summary>
     /// Intelligent, deterministic wave spawner and multi-station delivery coordinator.
-    /// Guarantees deadlock-free deliveries, exact seed consistency, and dynamic wave refills.
+    /// Guarantees exact pre-determined spawn order, permanent level consistency, and deadlock-free delivery.
     /// </summary>
     public class WaveSpawner : MonoBehaviour
     {
@@ -30,7 +30,7 @@ namespace StraySwarm.Gameplay
 
         private List<AnimalSpawnPoint> _spawnPoints = new List<AnimalSpawnPoint>();
         private List<DeliveryCrate> _activeCrates = new List<DeliveryCrate>();
-        private Queue<AnimalType> _deterministicQueue = new Queue<AnimalType>();
+        private Queue<ScheduledWaveSpawn> _scheduledQueue = new Queue<ScheduledWaveSpawn>();
         private List<FollowerBehavior> _liveAnimalsOnMap = new List<FollowerBehavior>();
 
         public int TotalQuota => _totalQuota;
@@ -50,8 +50,13 @@ namespace StraySwarm.Gameplay
 
         public void InitializeWaveSystem()
         {
-            // 1. Gather all scene spawn points and active crates
-            _spawnPoints = FindObjectsByType<AnimalSpawnPoint>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).ToList();
+            // 1. Gather all scene spawn points and sort them strictly by Hierarchy Order
+            _spawnPoints = FindObjectsByType<AnimalSpawnPoint>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+                .OrderBy(sp => sp.transform.GetSiblingIndex())
+                .ThenByDescending(sp => sp.transform.position.y)
+                .ThenBy(sp => sp.transform.position.x)
+                .ToList();
+
             _activeCrates = FindObjectsByType<DeliveryCrate>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).ToList();
 
             // 2. Fetch Level Data
@@ -65,14 +70,14 @@ namespace StraySwarm.Gameplay
             {
                 _totalQuota = data.TotalAnimalsToRescue;
                 _maxConcurrentOnMap = data.MaxConcurrentOnMap;
-                BuildDeterministicQueue(data);
+                BuildDeterministicSchedule(data);
             }
             else
             {
-                // Fallback default queue
+                // Fallback default schedule
                 _totalQuota = 12;
                 _maxConcurrentOnMap = 5;
-                BuildDefaultQueue();
+                BuildDefaultSchedule();
             }
 
             _totalSpawned = 0;
@@ -95,18 +100,31 @@ namespace StraySwarm.Gameplay
                 sp.CurrentAnimal = null;
             }
 
-            // 3. Spawn Initial Wave
+            // 3. Spawn Initial Wave according to pre-determined schedule
             SpawnWaveToCap();
 
             // 4. Configure Initial Crates with matching on-map requirements
             ConfigureAllCrates();
 
-            Debug.Log($"🎉 [WaveSpawner] Initialized with {_totalQuota} total quota ({_spawnPoints.Count} spawn points, {_activeCrates.Count} crates).");
+            Debug.Log($"🎉 [WaveSpawner] Initialized with {_totalQuota} total quota ({_spawnPoints.Count} sorted spawn points, {_activeCrates.Count} crates).");
         }
 
-        private void BuildDeterministicQueue(LevelData data)
+        private void BuildDeterministicSchedule(LevelData data)
         {
-            _deterministicQueue.Clear();
+            _scheduledQueue.Clear();
+
+            // A. If creator defined a handcrafted schedule in LevelData, use it directly!
+            if (data.FixedWaveSchedule != null && data.FixedWaveSchedule.Count > 0)
+            {
+                foreach (var step in data.FixedWaveSchedule)
+                {
+                    _scheduledQueue.Enqueue(step);
+                }
+                _totalQuota = data.FixedWaveSchedule.Count;
+                return;
+            }
+
+            // B. Otherwise, generate a permanent deterministic schedule seeded by LevelID
             Random.State originalState = Random.state;
             Random.InitState(data.GetDeterministicSeed());
 
@@ -116,19 +134,23 @@ namespace StraySwarm.Gameplay
                 allowed = new List<AnimalType> { AnimalType.Puppy, AnimalType.Kitten };
             }
 
-            // Generate deterministic sequence in chunks so crate batches are guaranteed solvable
+            int spawnPointCount = Mathf.Max(1, _spawnPoints.Count);
             int batchSize = 3;
             int generated = 0;
 
             while (generated < data.TotalAnimalsToRescue)
             {
-                // Pick a random species from allowed
                 AnimalType chosenType = allowed[Random.Range(0, allowed.Count)];
                 int countForBatch = Mathf.Min(batchSize, data.TotalAnimalsToRescue - generated);
 
                 for (int i = 0; i < countForBatch; i++)
                 {
-                    _deterministicQueue.Enqueue(chosenType);
+                    int pointIndex = (generated) % spawnPointCount;
+                    _scheduledQueue.Enqueue(new ScheduledWaveSpawn
+                    {
+                        SpawnPointIndex = pointIndex,
+                        Type = chosenType
+                    });
                     generated++;
                 }
             }
@@ -136,12 +158,17 @@ namespace StraySwarm.Gameplay
             Random.state = originalState;
         }
 
-        private void BuildDefaultQueue()
+        private void BuildDefaultSchedule()
         {
-            _deterministicQueue.Clear();
+            _scheduledQueue.Clear();
+            int spawnPointCount = Mathf.Max(1, _spawnPoints.Count);
             for (int i = 0; i < _totalQuota; i++)
             {
-                _deterministicQueue.Enqueue(i % 2 == 0 ? AnimalType.Puppy : AnimalType.Kitten);
+                _scheduledQueue.Enqueue(new ScheduledWaveSpawn
+                {
+                    SpawnPointIndex = i % spawnPointCount,
+                    Type = i % 2 == 0 ? AnimalType.Puppy : AnimalType.Kitten
+                });
             }
         }
 
@@ -151,29 +178,36 @@ namespace StraySwarm.Gameplay
 
             Vector3 playerPos = GetPlayerPosition();
 
-            while (_liveAnimalsOnMap.Count < _maxConcurrentOnMap && _deterministicQueue.Count > 0)
+            while (_liveAnimalsOnMap.Count < _maxConcurrentOnMap && _scheduledQueue.Count > 0)
             {
-                // Find available unoccupied spawn point that the player is NOT currently standing on
-                AnimalSpawnPoint freeSpot = _spawnPoints.FirstOrDefault(sp => !sp.IsOccupied && Vector3.Distance(sp.transform.position, playerPos) > 1.2f);
-                if (freeSpot == null)
-                {
-                    // Fallback to any free spot only if player is not in scene
-                    freeSpot = _spawnPoints.FirstOrDefault(sp => !sp.IsOccupied);
-                }
-                if (freeSpot == null) break; // All spots filled
+                ScheduledWaveSpawn nextSpawn = _scheduledQueue.Peek();
+                int targetIndex = Mathf.Clamp(nextSpawn.SpawnPointIndex, 0, _spawnPoints.Count - 1);
+                AnimalSpawnPoint targetPoint = _spawnPoints[targetIndex];
 
-                AnimalType nextType = _deterministicQueue.Dequeue();
-                GameObject prefab = GetAnimalPrefab(nextType);
+                // If scheduled point is occupied or player is right on it, find next open point
+                if (targetPoint.IsOccupied || Vector3.Distance(targetPoint.transform.position, playerPos) <= 1.2f)
+                {
+                    targetPoint = _spawnPoints.FirstOrDefault(sp => !sp.IsOccupied && Vector3.Distance(sp.transform.position, playerPos) > 1.2f);
+                }
+
+                if (targetPoint == null || targetPoint.IsOccupied)
+                {
+                    break; // No suitable point open right now; wait for player/delivery
+                }
+
+                _scheduledQueue.Dequeue();
+
+                GameObject prefab = GetAnimalPrefab(nextSpawn.Type);
                 if (prefab != null)
                 {
-                    GameObject animalGo = Instantiate(prefab, freeSpot.transform.position, Quaternion.identity);
+                    GameObject animalGo = Instantiate(prefab, targetPoint.transform.position, Quaternion.identity);
                     FollowerBehavior animal = animalGo.GetComponent<FollowerBehavior>();
                     if (animal != null)
                     {
-                        animal.AnimalType = nextType;
+                        animal.AnimalType = nextSpawn.Type;
                         _liveAnimalsOnMap.Add(animal);
-                        freeSpot.IsOccupied = true;
-                        freeSpot.CurrentAnimal = animal;
+                        targetPoint.IsOccupied = true;
+                        targetPoint.CurrentAnimal = animal;
                     }
                     _totalSpawned++;
                 }
@@ -210,7 +244,6 @@ namespace StraySwarm.Gameplay
 
             TailManager tail = FindAnyObjectByType<TailManager>();
             
-            // Add any species in tail
             foreach (AnimalType type in System.Enum.GetValues(typeof(AnimalType)))
             {
                 if (tail != null && tail.GetFollowerCountOfType(type) > 0 && !presentSpecies.Contains(type))
@@ -219,7 +252,6 @@ namespace StraySwarm.Gameplay
                 }
             }
 
-            // If nothing on map/tail, spawn from queue immediately!
             if (presentSpecies.Count == 0)
             {
                 SpawnWaveToCap();
@@ -228,7 +260,7 @@ namespace StraySwarm.Gameplay
 
             if (presentSpecies.Count == 0)
             {
-                if (_deterministicQueue.Count > 0) presentSpecies.Add(_deterministicQueue.Peek());
+                if (_scheduledQueue.Count > 0) presentSpecies.Add(_scheduledQueue.Peek().Type);
                 else presentSpecies.Add(AnimalType.Puppy);
             }
 
@@ -248,7 +280,7 @@ namespace StraySwarm.Gameplay
             int availableCollectible = CountAvailableAnimalsOfType(selectedType);
 
             // 4. If available is less than 2 and we still have queue items, spawn more of this type immediately to satisfy demand!
-            if (availableCollectible < 2 && _deterministicQueue.Contains(selectedType))
+            if (availableCollectible < 2 && _scheduledQueue.Any(s => s.Type == selectedType))
             {
                 SpawnSpecificAnimal(selectedType);
                 availableCollectible = CountAvailableAnimalsOfType(selectedType);
