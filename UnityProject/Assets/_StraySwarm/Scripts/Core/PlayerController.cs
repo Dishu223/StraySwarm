@@ -120,6 +120,23 @@ namespace StraySwarm.Core
             }
         }
 
+        public void ForceDirection(Vector2Int direction)
+        {
+            if (_currentNode == null || _gridManager == null) return;
+
+            Vector2Int nextPos = _currentNode.GridPosition + direction;
+            if (_currentNode.ValidDirections.Contains(direction))
+            {
+                StartMovingToNode(nextPos, direction);
+            }
+        }
+
+        public void StopMovement()
+        {
+            _isMoving = false;
+            _currentDirection = Vector2Int.zero;
+        }
+
         private void StartMovingToNode(Vector2Int gridPosition, Vector2Int direction)
         {
             NodeData candidateNode = _gridManager.GetNodeAt(gridPosition);

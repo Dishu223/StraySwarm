@@ -17,4 +17,4 @@ MonoBehaviour:
   PrimaryColor: {r: 0.36, g: 0.72, b: 1, a: 1}
   WorldSprite: {fileID: 0}
   ColorblindIcon: {fileID: 0}
-  CollectSound: {fileID: 0}
+  CollectSound: {fileID: 8300000, guid: 89220e7738d92864fbc65656d93fa0f3, type: 3}

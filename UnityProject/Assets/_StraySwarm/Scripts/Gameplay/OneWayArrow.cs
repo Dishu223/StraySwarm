@@ -69,12 +69,12 @@ namespace StraySwarm.Gameplay
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag("Player"))
+            if (other.CompareTag("Player") || other.GetComponent<PlayerController>() != null)
             {
                 PlayerController player = other.GetComponent<PlayerController>();
                 if (player != null)
                 {
-                    // Force the player to continue in this allowed direction
+                    player.ForceDirection(AllowedDirectionVector);
                     Debug.Log($"[OneWayArrow] Guiding player in direction {_direction}");
                 }
             }
