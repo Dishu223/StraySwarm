@@ -149,10 +149,17 @@ namespace StraySwarm.Gameplay
         {
             if (_spawnPoints.Count == 0) return;
 
+            Vector3 playerPos = GetPlayerPosition();
+
             while (_liveAnimalsOnMap.Count < _maxConcurrentOnMap && _deterministicQueue.Count > 0)
             {
-                // Find first available unoccupied spawn point
-                AnimalSpawnPoint freeSpot = _spawnPoints.FirstOrDefault(sp => !sp.IsOccupied);
+                // Find available unoccupied spawn point that the player is NOT currently standing on
+                AnimalSpawnPoint freeSpot = _spawnPoints.FirstOrDefault(sp => !sp.IsOccupied && Vector3.Distance(sp.transform.position, playerPos) > 1.2f);
+                if (freeSpot == null)
+                {
+                    // Fallback to any free spot only if player is not in scene
+                    freeSpot = _spawnPoints.FirstOrDefault(sp => !sp.IsOccupied);
+                }
                 if (freeSpot == null) break; // All spots filled
 
                 AnimalType nextType = _deterministicQueue.Dequeue();
@@ -171,6 +178,13 @@ namespace StraySwarm.Gameplay
                     _totalSpawned++;
                 }
             }
+        }
+
+        private Vector3 GetPlayerPosition()
+        {
+            GameObject player = GameObject.FindWithTag("Player");
+            if (player == null) player = GameObject.Find("Player");
+            return player != null ? player.transform.position : new Vector3(9999f, 9999f, 0f);
         }
 
         public void ConfigureAllCrates()
@@ -228,7 +242,7 @@ namespace StraySwarm.Gameplay
         {
             if (animal == null) return;
 
-            // Free the spawn point
+            // Free the spawn point marker
             AnimalSpawnPoint spot = _spawnPoints.FirstOrDefault(sp => sp.CurrentAnimal == animal);
             if (spot != null)
             {
@@ -237,9 +251,6 @@ namespace StraySwarm.Gameplay
             }
 
             _liveAnimalsOnMap.Remove(animal);
-
-            // Refill wave into newly opened spawn point
-            SpawnWaveToCap();
         }
 
         public void OnAnimalDelivered(FollowerBehavior animal)
@@ -247,6 +258,9 @@ namespace StraySwarm.Gameplay
             _totalDelivered++;
 
             Debug.Log($"🐾 [WaveSpawner] Delivered ({_totalDelivered}/{_totalQuota})");
+
+            // Refill the wave as animals are delivered to crates
+            SpawnWaveToCap();
 
             if (_totalDelivered >= _totalQuota)
             {
@@ -268,7 +282,8 @@ namespace StraySwarm.Gameplay
                 return;
             }
 
-            // Assign next requirement to this crate from remaining live/queued animals
+            // Spawn next wave and assign new crate requirement
+            SpawnWaveToCap();
             ConfigureCrate(crate);
         }
 
