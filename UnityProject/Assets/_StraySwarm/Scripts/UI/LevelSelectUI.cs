@@ -23,8 +23,6 @@ namespace StraySwarm.UI
         [SerializeField] private string _mainMenuScene = "1_MainMenu";
         [SerializeField] private string _gameplayScene = "3_Gameplay";
 
-        private int _selectedWorld = 0;
-
         private void Start()
         {
             RefreshUI();
