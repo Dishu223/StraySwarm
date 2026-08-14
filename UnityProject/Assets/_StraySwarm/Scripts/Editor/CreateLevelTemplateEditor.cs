@@ -101,7 +101,7 @@ namespace StraySwarm.Editor
             GameObject tilemapObj = new GameObject("FloorTilemap");
             tilemapObj.transform.SetParent(gridObj.transform);
             Tilemap tilemap = tilemapObj.AddComponent<Tilemap>();
-            tilemap.tileAnchor = new Vector3(0f, 0f, 0f); // 0,0 anchor for integer snapping!
+            tilemap.tileAnchor = new Vector3(0.5f, 0.5f, 0f); // 0.5, 0.5 anchor aligns sprites with grid cells
             TilemapRenderer tmr = tilemapObj.AddComponent<TilemapRenderer>();
             tmr.sortingOrder = 0;
 
