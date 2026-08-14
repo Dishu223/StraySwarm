@@ -11,10 +11,15 @@ namespace StraySwarm.Gameplay
     {
         [Header("Data Configuration")]
         [SerializeField] private AnimalData _animalData;
+        [SerializeField] private AnimalType _overrideType = AnimalType.Puppy;
 
         public bool IsCollected { get; private set; } = false;
         public AnimalData Data => _animalData;
-        public AnimalType AnimalType => _animalData != null ? _animalData.Type : AnimalType.BluePuppy;
+        public AnimalType AnimalType
+        {
+            get => _animalData != null ? _animalData.Type : _overrideType;
+            set => _overrideType = value;
+        }
 
         private SpriteRenderer _spriteRenderer;
         private CubeWobble _wobble;
