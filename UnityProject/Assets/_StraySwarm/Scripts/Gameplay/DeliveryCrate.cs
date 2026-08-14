@@ -43,7 +43,7 @@ namespace StraySwarm.Gameplay
         {
             if (IsFull || animal == null) return false;
 
-            bool isMatch = (animal.Data != null && animal.Data.Type == TargetAnimalType) || (animal.AnimalColor == RequiredColor);
+            bool isMatch = animal.AnimalType == TargetAnimalType || (animal.Data != null && animal.Data.Type == TargetAnimalType);
             if (isMatch)
             {
                 _currentLoad++;

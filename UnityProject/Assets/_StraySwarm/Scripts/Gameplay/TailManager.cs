@@ -112,7 +112,7 @@ namespace StraySwarm.Gameplay
                 var animal = _tail[i];
                 if (animal != null)
                 {
-                    bool isMatch = (animal.Data != null && animal.Data.Type == crate.TargetAnimalType) || (animal.AnimalColor == crate.RequiredColor);
+                    bool isMatch = animal.AnimalType == crate.TargetAnimalType || (animal.Data != null && animal.Data.Type == crate.TargetAnimalType);
                     if (isMatch)
                     {
                         matchingAnimals.Add(animal);

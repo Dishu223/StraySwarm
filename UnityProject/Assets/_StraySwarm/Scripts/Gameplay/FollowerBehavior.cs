@@ -48,8 +48,6 @@ namespace StraySwarm.Gameplay
         {
             if (_animalData != null)
             {
-                AnimalColor = _animalData.Type.ToString().Replace("Puppy", "").Replace("Kitten", "").Replace("Pigeon", "").Replace("Frog", "").Replace("Hamster", "").Replace("Bunny", "");
-                
                 if (_spriteRenderer == null) _spriteRenderer = GetComponent<SpriteRenderer>();
                 if (_spriteRenderer != null)
                 {
@@ -57,7 +55,7 @@ namespace StraySwarm.Gameplay
                     {
                         _spriteRenderer.sprite = _animalData.WorldSprite;
                     }
-                    _spriteRenderer.color = _animalData.PrimaryColor;
+                    _spriteRenderer.color = Color.white; // Keep original pure sprite colors!
                 }
             }
         }
