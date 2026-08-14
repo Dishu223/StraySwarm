@@ -142,24 +142,25 @@ namespace StraySwarm.Editor
                 }
             }
 
-            // 7. Instantiate SpawnPoints at selected cell centers
+            // 7. Instantiate SpawnPoints at exact Tilemap cell centers
             int index = 0;
             List<GameObject> createdObjs = new List<GameObject>();
             foreach (var cell in selectedCells)
             {
-                Vector3 worldPos = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
+                Vector3 worldCenter = tilemap.GetCellCenterWorld(cell);
+                Vector3 localPos = container.InverseTransformPoint(worldCenter);
 
                 GameObject spGo;
                 if (spawnPrefab != null && prefabStage == null)
                 {
                     spGo = (GameObject)PrefabUtility.InstantiatePrefab(spawnPrefab, container);
-                    spGo.transform.position = worldPos;
+                    spGo.transform.position = new Vector3(worldCenter.x, worldCenter.y, 0f);
                 }
                 else
                 {
                     spGo = new GameObject($"AnimalSpawnPoint ({index})");
                     spGo.transform.SetParent(container, false);
-                    spGo.transform.localPosition = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
+                    spGo.transform.localPosition = new Vector3(localPos.x, localPos.y, 0f);
                     spGo.AddComponent<AnimalSpawnPoint>();
                 }
 

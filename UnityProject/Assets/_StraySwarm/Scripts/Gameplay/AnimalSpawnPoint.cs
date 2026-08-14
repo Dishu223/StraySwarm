@@ -24,7 +24,7 @@ namespace StraySwarm.Gameplay
         public void SnapToTileCenter()
         {
             Tilemap tilemap = GetComponentInParent<Tilemap>() ?? Object.FindAnyObjectByType<Tilemap>();
-            if (tilemap != null && tilemap.tileAnchor.x > 0.1f)
+            if (tilemap != null)
             {
                 Vector3Int cell = tilemap.WorldToCell(transform.position);
                 Vector3 center = tilemap.GetCellCenterWorld(cell);
