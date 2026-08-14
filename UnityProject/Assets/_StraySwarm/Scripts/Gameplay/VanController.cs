@@ -76,13 +76,13 @@ namespace StraySwarm.Gameplay
                 }
                 return true;
             }
-            return false; // Wrong color!
+            return false; // Wrong animal!
         }
 
         private void DriveAway()
         {
             IsDrivingAway = true;
-            Debug.Log($"[VanController] {RequiredColor} Van is FULL! Driving away!");
+            Debug.Log($"[VanController] {TargetAnimalType} Van is FULL! Driving away!");
             
             StartCoroutine(DelayedDriveAwayRoutine());
         }

@@ -11,8 +11,7 @@ namespace StraySwarm.Gameplay
     public class DeliveryCrate : MonoBehaviour
     {
         [Header("Crate Configuration")]
-        public AnimalType TargetAnimalType;
-        public string RequiredColor = "Blue";
+        public AnimalType TargetAnimalType = AnimalType.Puppy;
         public int Capacity = 3;
 
         [Header("Visual Feedback")]
@@ -36,7 +35,6 @@ namespace StraySwarm.Gameplay
         {
             TargetAnimalType = type;
             Capacity = capacity;
-            RequiredColor = type.ToString().Replace("Puppy", "").Replace("Kitten", "").Replace("Pigeon", "").Replace("Frog", "").Replace("Hamster", "").Replace("Bunny", "");
         }
 
         public bool TryAcceptAnimal(FollowerBehavior animal)
@@ -94,7 +92,7 @@ namespace StraySwarm.Gameplay
                 JuiceManager.Instance.PlayWinConfetti();
             }
 
-            Debug.Log($"[DeliveryCrate] Crate for {RequiredColor} is FULL!");
+            Debug.Log($"[DeliveryCrate] Crate for {TargetAnimalType} is FULL!");
             
             // Notify StationManager
             StationManager.Instance?.CheckAllStations();
