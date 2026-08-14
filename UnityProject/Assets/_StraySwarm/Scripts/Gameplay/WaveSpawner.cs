@@ -51,13 +51,13 @@ namespace StraySwarm.Gameplay
         public void InitializeWaveSystem()
         {
             // 1. Gather all scene spawn points and sort them strictly by Hierarchy Order
-            _spawnPoints = FindObjectsByType<AnimalSpawnPoint>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+            _spawnPoints = FindObjectsByType<AnimalSpawnPoint>(FindObjectsInactive.Exclude)
                 .OrderBy(sp => sp.transform.GetSiblingIndex())
                 .ThenByDescending(sp => sp.transform.position.y)
                 .ThenBy(sp => sp.transform.position.x)
                 .ToList();
 
-            _activeCrates = FindObjectsByType<DeliveryCrate>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).ToList();
+            _activeCrates = FindObjectsByType<DeliveryCrate>(FindObjectsInactive.Exclude).ToList();
 
             // 2. Fetch Level Data
             LevelData data = null;
@@ -85,7 +85,7 @@ namespace StraySwarm.Gameplay
             _liveAnimalsOnMap.Clear();
 
             // Clean up any uncollected animals in scene to prevent duplicates
-            FollowerBehavior[] existingAnimals = FindObjectsByType<FollowerBehavior>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            FollowerBehavior[] existingAnimals = FindObjectsByType<FollowerBehavior>(FindObjectsInactive.Exclude);
             foreach (var animal in existingAnimals)
             {
                 if (!animal.IsCollected)

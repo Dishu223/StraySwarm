@@ -64,6 +64,7 @@ The user is a game developer building Stray Swarm. They want clear, explicit ins
 1. **Never leave empty Inspector fields unexplained:** Whenever a script is created, modified, or introduced, the AI MUST explicitly list all its Inspector serialized fields, explain what each field is for, and give the user the exact drag-and-drop source in Unity.
 2. **Account for every field then and there:** Before moving to any next task or phase, verify that every Inspector field on all active scene objects is completely filled.
 3. **Always implement robust auto-fallback dependencies in code:** In `Awake()` / `Start()`, always write fallback `GetComponent<T>()` or `FindAnyObjectByType<T>()` for serialized component dependencies (e.g. `_pathHistory`, `_gameManager`, `_tailManager`, `_vanQueue`, `_attachedCrate`) so the game NEVER crashes if a field is unset in the Inspector.
+4. **Unity 6 API Compliance (Zero Deprecation Warnings):** Unity 6 (6000.x) has deprecated `FindObjectsSortMode`. NEVER pass `FindObjectsSortMode` to `FindObjectsByType<T>()`. Always call `Object.FindObjectsByType<T>(FindObjectsInactive.Include)` or `Object.FindObjectsByType<T>(FindObjectsInactive.Exclude)` directly without any sort parameters.
 
 - **Skill Level:** Beginner Unity developer. Knows basics but needs step-by-step guidance.
 - **Teaching Standard:**

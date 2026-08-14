@@ -45,7 +45,7 @@ namespace StraySwarm.Editor
             }
 
             // 1. Snap SpawnPoints
-            var spawnPoints = Object.FindObjectsByType<AnimalSpawnPoint>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var spawnPoints = Object.FindObjectsByType<AnimalSpawnPoint>(FindObjectsInactive.Include);
             foreach (var sp in spawnPoints)
             {
                 Undo.RecordObject(sp.transform, "Snap to Path Center");
@@ -54,7 +54,7 @@ namespace StraySwarm.Editor
             }
 
             // 2. Snap Obstacles
-            var walls = Object.FindObjectsByType<NumberedWall>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var walls = Object.FindObjectsByType<NumberedWall>(FindObjectsInactive.Include);
             foreach (var wall in walls)
             {
                 Undo.RecordObject(wall.transform, "Snap to Path Center");
@@ -62,7 +62,7 @@ namespace StraySwarm.Editor
                 snappedCount++;
             }
 
-            var arrows = Object.FindObjectsByType<OneWayArrow>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var arrows = Object.FindObjectsByType<OneWayArrow>(FindObjectsInactive.Include);
             foreach (var arrow in arrows)
             {
                 Undo.RecordObject(arrow.transform, "Snap to Path Center");
@@ -71,7 +71,7 @@ namespace StraySwarm.Editor
             }
 
             // 3. Snap Stations
-            var stations = Object.FindObjectsByType<RescueStation>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var stations = Object.FindObjectsByType<RescueStation>(FindObjectsInactive.Include);
             foreach (var station in stations)
             {
                 Undo.RecordObject(station.transform, "Snap to Path Center");
