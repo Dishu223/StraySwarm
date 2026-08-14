@@ -49,32 +49,32 @@ namespace StraySwarm.Editor
             }
 
             // 3. Find or Create the AnimalSpawnPoints container
-            Transform rootTransform = tilemap.transform.root;
-            Transform container = rootTransform.Find("AnimalSpawnPoints");
-            if (container == null)
+            Transform container = null;
+            var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+            if (prefabStage != null)
             {
-                // Check if opened directly under level map
-                GameObject mapObj = GameObject.Find("Level_02_Map") ?? GameObject.Find("Level_01_Map") ?? tilemap.transform.parent?.gameObject;
-                if (mapObj != null)
+                Transform stageRoot = prefabStage.prefabContentsRoot.transform;
+                container = stageRoot.Find("AnimalSpawnPoints");
+                if (container == null)
                 {
-                    Transform existing = mapObj.transform.Find("AnimalSpawnPoints");
-                    if (existing != null) container = existing;
-                    else
-                    {
-                        GameObject newContainer = new GameObject("AnimalSpawnPoints");
-                        newContainer.transform.SetParent(mapObj.transform, false);
-                        container = newContainer.transform;
-                    }
+                    GameObject newContainer = new GameObject("AnimalSpawnPoints");
+                    newContainer.transform.SetParent(stageRoot, false);
+                    container = newContainer.transform;
+                }
+            }
+            else
+            {
+                Transform rootTransform = tilemap.transform.root;
+                container = rootTransform.Find("AnimalSpawnPoints");
+                if (container == null)
+                {
+                    GameObject newContainer = new GameObject("AnimalSpawnPoints");
+                    newContainer.transform.SetParent(rootTransform, false);
+                    container = newContainer.transform;
                 }
             }
 
-            if (container == null)
-            {
-                GameObject newContainer = new GameObject("AnimalSpawnPoints");
-                container = newContainer.transform;
-            }
-
-            // 4. Clear any previous spawn points under container or root
+            // 4. Clear any previous spawn points under container
             Undo.RegisterFullObjectHierarchyUndo(container.gameObject, "Auto-Generate Clustered Spawn Points");
             
             for (int i = container.childCount - 1; i >= 0; i--)
@@ -82,7 +82,7 @@ namespace StraySwarm.Editor
                 Undo.DestroyObjectImmediate(container.GetChild(i).gameObject);
             }
 
-            // Also clean up any loose spawn points at root level
+            // Also clean up any loose spawn points at stage root level
             var loosePoints = Object.FindObjectsByType<AnimalSpawnPoint>(FindObjectsInactive.Include);
             foreach (var lp in loosePoints)
             {
@@ -144,12 +144,13 @@ namespace StraySwarm.Editor
 
             // 7. Instantiate SpawnPoints at selected cell centers
             int index = 0;
+            List<GameObject> createdObjs = new List<GameObject>();
             foreach (var cell in selectedCells)
             {
                 Vector3 worldPos = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
 
                 GameObject spGo;
-                if (spawnPrefab != null)
+                if (spawnPrefab != null && prefabStage == null)
                 {
                     spGo = (GameObject)PrefabUtility.InstantiatePrefab(spawnPrefab, container);
                     spGo.transform.position = worldPos;
@@ -158,23 +159,32 @@ namespace StraySwarm.Editor
                 {
                     spGo = new GameObject($"AnimalSpawnPoint ({index})");
                     spGo.transform.SetParent(container, false);
-                    spGo.transform.position = worldPos;
+                    spGo.transform.localPosition = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
                     spGo.AddComponent<AnimalSpawnPoint>();
                 }
 
                 spGo.name = $"AnimalSpawnPoint ({index})";
                 Undo.RegisterCreatedObjectUndo(spGo, "Created Spawn Point");
+                createdObjs.Add(spGo);
                 index++;
             }
 
             // 8. Mark Stage Dirty
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-            if (PrefabStageUtility.GetCurrentPrefabStage() != null)
+            if (prefabStage != null)
             {
                 EditorUtility.SetDirty(container.gameObject);
+                EditorUtility.SetDirty(prefabStage.prefabContentsRoot);
             }
 
-            Selection.activeGameObject = container.gameObject;
+            if (createdObjs.Count > 0)
+            {
+                Selection.objects = createdObjs.ToArray();
+            }
+            else
+            {
+                Selection.activeGameObject = container.gameObject;
+            }
 
             Debug.Log($"📍 [AutoGenerateSpawnPoints] Successfully generated {selectedCells.Count} clustered spawn points across {clusterCount} groups!");
         }
