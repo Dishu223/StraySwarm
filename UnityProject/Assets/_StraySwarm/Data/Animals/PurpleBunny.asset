@@ -15,6 +15,6 @@ MonoBehaviour:
   Type: 5
   DisplayName: Purple Bunny
   PrimaryColor: {r: 0.64, g: 0.61, b: 1, a: 1}
-  WorldSprite: {fileID: 0}
+  WorldSprite: {fileID: 1971385751, guid: d01a466655c75f041a971e94979af4f9, type: 3}
   ColorblindIcon: {fileID: 0}
   CollectSound: {fileID: 8300000, guid: fcbfaa627b5574d4eb87c31b46f13ea7, type: 3}

@@ -15,6 +15,6 @@ MonoBehaviour:
   Type: 0
   DisplayName: Blue Puppy
   PrimaryColor: {r: 0.36, g: 0.72, b: 1, a: 1}
-  WorldSprite: {fileID: 0}
+  WorldSprite: {fileID: -4111899462962979593, guid: ba9bfe960185c004491af628dbca0312, type: 3}
   ColorblindIcon: {fileID: 0}
   CollectSound: {fileID: 8300000, guid: 89220e7738d92864fbc65656d93fa0f3, type: 3}

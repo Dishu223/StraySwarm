@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6069d37cceff8424fa9958e157260ced, type: 3}
   m_Name: OrangeHamster
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Data.AnimalData
-  Type: 4
+  Type: 5
   DisplayName: Orange Hamster
   PrimaryColor: {r: 1, g: 0.62, b: 0.26, a: 1}
-  WorldSprite: {fileID: 0}
+  WorldSprite: {fileID: -1424546796599349136, guid: ba9bfe960185c004491af628dbca0312, type: 3}
   ColorblindIcon: {fileID: 0}
   CollectSound: {fileID: 8300000, guid: 075b8b66cd75ea54591fabea3bd013d5, type: 3}

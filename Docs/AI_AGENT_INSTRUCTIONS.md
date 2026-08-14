@@ -58,6 +58,13 @@ Full art direction details are in `Docs/03_ART_BIBLE.md`.
 
 ## 3. User Profile
 
+The user is a game developer building Stray Swarm. They want clear, explicit instructions on what to wire, where to drag assets, and what each Inspector field does before moving forward.
+
+## 3b. Strict Inspector Wiring & Communication Standard (CRITICAL RULE)
+1. **Never leave empty Inspector fields unexplained:** Whenever a script is created, modified, or introduced, the AI MUST explicitly list all its Inspector serialized fields, explain what each field is for, and give the user the exact drag-and-drop source in Unity.
+2. **Account for every field then and there:** Before moving to any next task or phase, verify that every Inspector field on all active scene objects is completely filled.
+3. **Always implement robust auto-fallback dependencies in code:** In `Awake()` / `Start()`, always write fallback `GetComponent<T>()` or `FindAnyObjectByType<T>()` for serialized component dependencies (e.g. `_pathHistory`, `_gameManager`, `_tailManager`, `_vanQueue`, `_attachedCrate`) so the game NEVER crashes if a field is unset in the Inspector.
+
 - **Skill Level:** Beginner Unity developer. Knows basics but needs step-by-step guidance.
 - **Teaching Standard:**
   - Always explain "why" before "what".

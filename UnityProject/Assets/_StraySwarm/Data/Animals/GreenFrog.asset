@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6069d37cceff8424fa9958e157260ced, type: 3}
   m_Name: GreenFrog
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Data.AnimalData
-  Type: 3
+  Type: 2
   DisplayName: Green Frog
   PrimaryColor: {r: 0.49, g: 0.85, b: 0.62, a: 1}
-  WorldSprite: {fileID: 0}
+  WorldSprite: {fileID: -7703382335436942168, guid: ba9bfe960185c004491af628dbca0312, type: 3}
   ColorblindIcon: {fileID: 0}
   CollectSound: {fileID: 8300000, guid: 0ffbcaa28a706e14db1b26be975a5168, type: 3}

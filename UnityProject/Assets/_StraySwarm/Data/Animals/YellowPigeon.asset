@@ -15,6 +15,6 @@ MonoBehaviour:
   Type: 2
   DisplayName: Yellow Pigeon
   PrimaryColor: {r: 1, g: 0.8, b: 0.01, a: 1}
-  WorldSprite: {fileID: 0}
+  WorldSprite: {fileID: -6893249321379089444, guid: ba9bfe960185c004491af628dbca0312, type: 3}
   ColorblindIcon: {fileID: 0}
   CollectSound: {fileID: 8300000, guid: 35eba2240813d854d88e7684392069dd, type: 3}
