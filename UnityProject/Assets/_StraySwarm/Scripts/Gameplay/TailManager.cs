@@ -79,6 +79,19 @@ namespace StraySwarm.Gameplay
                 }
             }
         }
+
+        public int GetFollowerCountOfType(AnimalType type)
+        {
+            int count = 0;
+            for (int i = 0; i < _tail.Count; i++)
+            {
+                if (_tail[i] != null && _tail[i].AnimalType == type)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
         
         // This triggers when the player walks over an animal (requires 2D Colliders!)
         private void OnTriggerEnter2D(Collider2D other)

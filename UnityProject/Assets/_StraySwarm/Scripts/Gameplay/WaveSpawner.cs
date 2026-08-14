@@ -203,39 +203,94 @@ namespace StraySwarm.Gameplay
         {
             if (crate == null) return;
 
-            // Find animal types currently present on the map
-            var availableTypesOnMap = _liveAnimalsOnMap
-                .Where(a => a != null && !a.IsCollected)
-                .Select(a => a.AnimalType)
-                .Distinct()
-                .ToList();
+            // 1. Gather all species that currently have at least 1 alive animal (on map or in tail)
+            List<AnimalType> presentSpecies = new List<AnimalType>();
+            var onMapSpecies = _liveAnimalsOnMap.Where(a => a != null && !a.IsCollected).Select(a => a.AnimalType).Distinct();
+            presentSpecies.AddRange(onMapSpecies);
 
-            if (availableTypesOnMap.Count == 0)
+            TailManager tail = FindAnyObjectByType<TailManager>();
+            
+            // Add any species in tail
+            foreach (AnimalType type in System.Enum.GetValues(typeof(AnimalType)))
             {
-                // If all collected or in tail, check what's in tail or deterministic queue
-                availableTypesOnMap = _deterministicQueue.Distinct().ToList();
+                if (tail != null && tail.GetFollowerCountOfType(type) > 0 && !presentSpecies.Contains(type))
+                {
+                    presentSpecies.Add(type);
+                }
             }
 
-            AnimalType selectedType = AnimalType.Puppy;
+            // If nothing on map/tail, spawn from queue immediately!
+            if (presentSpecies.Count == 0)
+            {
+                SpawnWaveToCap();
+                presentSpecies.AddRange(_liveAnimalsOnMap.Where(a => a != null && !a.IsCollected).Select(a => a.AnimalType).Distinct());
+            }
 
+            if (presentSpecies.Count == 0)
+            {
+                if (_deterministicQueue.Count > 0) presentSpecies.Add(_deterministicQueue.Peek());
+                else presentSpecies.Add(AnimalType.Puppy);
+            }
+
+            // 2. Select species (respecting multi-station exclusion if possible)
+            AnimalType selectedType = presentSpecies[0];
             if (excludeTypes != null)
             {
-                var candidate = availableTypesOnMap.FirstOrDefault(t => !excludeTypes.Contains(t));
-                if (candidate != default(AnimalType) || availableTypesOnMap.Contains(AnimalType.Puppy))
+                var candidate = presentSpecies.FirstOrDefault(t => !excludeTypes.Contains(t));
+                if (candidate != default(AnimalType) || presentSpecies.Contains(AnimalType.Puppy))
                 {
-                    selectedType = candidate != default(AnimalType) ? candidate : availableTypesOnMap[0];
+                    selectedType = candidate != default(AnimalType) ? candidate : presentSpecies[0];
                 }
                 excludeTypes.Add(selectedType);
             }
-            else if (availableTypesOnMap.Count > 0)
+
+            // 3. Count exact collectible count of this species (On Map + In Tail)
+            int availableCollectible = CountAvailableAnimalsOfType(selectedType);
+
+            // 4. If available is less than 2 and we still have queue items, spawn more of this type immediately to satisfy demand!
+            if (availableCollectible < 2 && _deterministicQueue.Contains(selectedType))
             {
-                selectedType = availableTypesOnMap[0];
+                SpawnSpecificAnimal(selectedType);
+                availableCollectible = CountAvailableAnimalsOfType(selectedType);
             }
 
-            // Capacity defaults to 2 or 3 (or remaining count for that species)
-            int capacity = Mathf.Clamp(3, 1, RemainingQuota);
-            crate.Initialize(selectedType, capacity);
-            Debug.Log($"📦 [WaveSpawner] Crate configured: Target = {selectedType}, Capacity = {capacity}");
+            // 5. Set Capacity: NEVER exceed what is actually collectible on map + tail! (Deadlock-Free Guarantee)
+            int maxCap = Mathf.Clamp(availableCollectible, 1, Mathf.Min(3, RemainingQuota));
+            crate.Initialize(selectedType, maxCap);
+
+            Debug.Log($"📦 [WaveSpawner] Solvability Guaranteed: Target = {selectedType}, Capacity = {maxCap} (Available = {availableCollectible})");
+        }
+
+        public int CountAvailableAnimalsOfType(AnimalType type)
+        {
+            int onMap = _liveAnimalsOnMap.Count(a => a != null && !a.IsCollected && a.AnimalType == type);
+            TailManager tail = FindAnyObjectByType<TailManager>();
+            int inTail = tail != null ? tail.GetFollowerCountOfType(type) : 0;
+            return onMap + inTail;
+        }
+
+        private void SpawnSpecificAnimal(AnimalType type)
+        {
+            if (_spawnPoints.Count == 0) return;
+            Vector3 playerPos = GetPlayerPosition();
+            AnimalSpawnPoint freeSpot = _spawnPoints.FirstOrDefault(sp => !sp.IsOccupied && Vector3.Distance(sp.transform.position, playerPos) > 1.2f);
+            if (freeSpot == null) freeSpot = _spawnPoints.FirstOrDefault(sp => !sp.IsOccupied);
+            if (freeSpot == null) return;
+
+            GameObject prefab = GetAnimalPrefab(type);
+            if (prefab != null)
+            {
+                GameObject animalGo = Instantiate(prefab, freeSpot.transform.position, Quaternion.identity);
+                FollowerBehavior animal = animalGo.GetComponent<FollowerBehavior>();
+                if (animal != null)
+                {
+                    animal.AnimalType = type;
+                    _liveAnimalsOnMap.Add(animal);
+                    freeSpot.IsOccupied = true;
+                    freeSpot.CurrentAnimal = animal;
+                }
+                _totalSpawned++;
+            }
         }
 
         public void OnAnimalCollected(FollowerBehavior animal)
