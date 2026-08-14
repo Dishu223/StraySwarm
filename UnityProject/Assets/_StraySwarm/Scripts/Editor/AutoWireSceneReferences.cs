@@ -84,6 +84,14 @@ namespace StraySwarm.Editor
                     so.ApplyModifiedProperties();
                     wiredCount++;
                 }
+
+                // Ensure StationManager exists
+                StationManager sm = Object.FindAnyObjectByType<StationManager>();
+                if (sm == null)
+                {
+                    stationGo.AddComponent<StationManager>();
+                    wiredCount++;
+                }
             }
 
             // 3. Wire GameManager GameObject

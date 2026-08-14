@@ -87,15 +87,34 @@ namespace StraySwarm.Gameplay
                 _crateRenderer.sprite = _fullCrateSprite;
             }
 
-            if (JuiceManager.Instance != null)
-            {
-                JuiceManager.Instance.PlayWinConfetti();
-            }
-
             Debug.Log($"[DeliveryCrate] Crate for {TargetAnimalType} is FULL!");
             
-            // Notify StationManager
-            StationManager.Instance?.CheckAllStations();
+            // 1. Check via StationManager if present
+            if (StationManager.Instance != null)
+            {
+                StationManager.Instance.CheckAllStations();
+            }
+            else
+            {
+                // 2. Direct fallback: check all active crates in scene!
+                DeliveryCrate[] allCrates = FindObjectsByType<DeliveryCrate>(FindObjectsInactive.Exclude);
+                bool allFull = true;
+                foreach (var crate in allCrates)
+                {
+                    if (!crate.IsFull)
+                    {
+                        allFull = false;
+                        break;
+                    }
+                }
+
+                if (allFull)
+                {
+                    Debug.Log("🎉 [DeliveryCrate] All crates filled! Triggering Level Win!");
+                    Core.GameManager gm = FindAnyObjectByType<Core.GameManager>();
+                    if (gm != null) gm.WinGame();
+                }
+            }
         }
 
         private IEnumerator BounceRoutine()
