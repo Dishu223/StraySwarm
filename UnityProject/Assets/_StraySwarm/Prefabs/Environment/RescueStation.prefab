@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 359421865}
   - component: {fileID: 359421868}
   - component: {fileID: 359421870}
-  - component: {fileID: 359421871}
   m_Layer: 0
   m_Name: RescueStation
   m_TagString: Untagged
@@ -100,6 +99,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &359421867
 BoxCollider2D:
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -140,7 +140,6 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
   m_Size: {x: 1.2, y: 1.2}
   m_EdgeRadius: 0
 --- !u!114 &359421865
@@ -189,18 +188,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa2b7bfd2d08db4c8ccae0edb54c868, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.StationPulse
---- !u!114 &359421871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 359421862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c08fa23fa34b07044ab065403e5cfcf2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Utils.GridSnap
 --- !u!1 &956666069
 GameObject:
   m_ObjectHideFlags: 0
