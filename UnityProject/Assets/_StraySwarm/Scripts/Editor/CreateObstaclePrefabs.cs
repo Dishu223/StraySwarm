@@ -22,7 +22,8 @@ namespace StraySwarm.Editor
                 Directory.CreateDirectory(prefabDir);
             }
 
-            Sprite defaultSprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+            Sprite defaultSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Placeholders/RoundedCube.png");
+            if (defaultSprite == null) defaultSprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
             Material spriteMat = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
             TMP_FontAsset font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/LilitaOne-Regular SDF.asset");
 
@@ -39,7 +40,7 @@ namespace StraySwarm.Editor
                 sr.color = new Color(1f, 0.8f, 0f, 0.9f); // Golden yellow
                 if (spriteMat != null) sr.material = spriteMat;
                 sr.sortingOrder = 2;
-                go.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
+                go.transform.localScale = new Vector3(0.85f, 0.85f, 1f);
 
                 // Arrow Script & Trigger
                 BoxCollider2D col = go.AddComponent<BoxCollider2D>();
@@ -68,9 +69,9 @@ namespace StraySwarm.Editor
                 sr.sortingOrder = 6;
                 go.transform.localScale = new Vector3(0.85f, 0.85f, 1f);
 
-                // Solid Box Collider
+                // Trigger Box Collider (for conga player detection)
                 BoxCollider2D col = go.AddComponent<BoxCollider2D>();
-                col.isTrigger = false;
+                col.isTrigger = true;
                 col.size = new Vector2(1f, 1f);
 
                 // Number Text Child

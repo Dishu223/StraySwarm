@@ -25,8 +25,9 @@ namespace StraySwarm.Editor
             string dataDir = "Assets/_StraySwarm/Data/Animals";
             string[] animalNames = { "BluePuppy", "PinkKitten", "YellowPigeon", "GreenFrog", "OrangeHamster", "PurpleBunny" };
 
-            // Find default sprite
-            Sprite defaultSprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+            // Find default high-res cube sprite
+            Sprite defaultSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Placeholders/RoundedCube.png");
+            if (defaultSprite == null) defaultSprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
             Material spriteMat = AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
 
             int createdCount = 0;
