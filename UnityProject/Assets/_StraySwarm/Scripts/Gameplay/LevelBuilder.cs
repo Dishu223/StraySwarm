@@ -74,30 +74,21 @@ namespace StraySwarm.Gameplay
 
             ClearSpawnedEntities();
 
-            // 1. Position Player
+            // 1. If LevelData has a handcrafted MapPrefab, instantiate it!
+            if (data.MapPrefab != null)
+            {
+                GameObject mapInstance = Instantiate(data.MapPrefab, Vector3.zero, Quaternion.identity, _spawnedContainer);
+                mapInstance.name = $"{data.LevelName}_Map";
+            }
+
+            // 2. Position Player
             if (_playerTransform != null && data.PlayerStartCell != Vector2Int.zero)
             {
                 _playerTransform.position = new Vector3(data.PlayerStartCell.x, data.PlayerStartCell.y, 0);
             }
 
-            // 2. Spawn Animals (only if WaveSpawner is not managing dynamic waves)
-            bool isWaveSpawnerActive = WaveSpawner.Instance != null || FindAnyObjectByType<WaveSpawner>() != null;
-            if (!isWaveSpawnerActive && data.AnimalSpawns != null)
-            {
-                foreach (var entry in data.AnimalSpawns)
-                {
-                    GameObject prefab = GetAnimalPrefab(entry.Type);
-                    if (prefab != null)
-                    {
-                        Vector3 worldPos = new Vector3(entry.GridPosition.x, entry.GridPosition.y, 0);
-                        GameObject animal = Instantiate(prefab, worldPos, Quaternion.identity, _spawnedContainer);
-                        animal.name = $"Animal_{entry.Type}";
-                    }
-                }
-            }
-
-            // 3. Spawn One-Way Arrows
-            if (data.OneWayArrows != null)
+            // 3. Spawn One-Way Arrows from data if defined
+            if (data.OneWayArrows != null && data.OneWayArrows.Count > 0)
             {
                 foreach (var arrow in data.OneWayArrows)
                 {
@@ -110,8 +101,8 @@ namespace StraySwarm.Gameplay
                 }
             }
 
-            // 4. Spawn Numbered Walls
-            if (data.NumberedWalls != null)
+            // 4. Spawn Numbered Walls from data if defined
+            if (data.NumberedWalls != null && data.NumberedWalls.Count > 0)
             {
                 foreach (var wall in data.NumberedWalls)
                 {
@@ -124,17 +115,13 @@ namespace StraySwarm.Gameplay
                 }
             }
 
-            // 5. Configure Stations
-            if (data.Stations != null && data.Stations.Count > 0)
+            // 5. Initialize Wave Spawner on the active / instantiated map
+            if (WaveSpawner.Instance != null)
             {
-                DeliveryCrate mainCrate = FindAnyObjectByType<DeliveryCrate>();
-                if (mainCrate != null)
-                {
-                    mainCrate.Initialize(data.Stations[0].TargetType, data.Stations[0].Capacity);
-                }
+                WaveSpawner.Instance.InitializeWaveSystem();
             }
 
-            Debug.Log($"🎉 [LevelBuilder] Built Level: {data.LevelName} ({data.AnimalSpawns?.Count ?? 0} animals, {data.OneWayArrows?.Count ?? 0} arrows, {data.NumberedWalls?.Count ?? 0} walls)");
+            Debug.Log($"🎉 [LevelBuilder] Built Level: {data.LevelName} (MapPrefab: {(data.MapPrefab != null ? data.MapPrefab.name : "Active Scene")})");
         }
 
         public void ClearSpawnedEntities()

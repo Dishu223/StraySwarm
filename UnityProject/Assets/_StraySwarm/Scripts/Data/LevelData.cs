@@ -53,6 +53,10 @@ namespace StraySwarm.Data
         public string LevelName = "Level 1";
         public WorldTheme World = WorldTheme.Desert;
 
+        [Header("Handcrafted Level Map Prefab")]
+        [Tooltip("The prefab containing the Tilemap, Spawn Points, Stations, and Obstacles for this level (instantiated dynamically).")]
+        public GameObject MapPrefab;
+
         [Header("Wave Spawning Settings")]
         [Tooltip("Total number of animals required to rescue and deliver to finish the level.")]
         public int TotalAnimalsToRescue = 12;
