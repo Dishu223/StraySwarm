@@ -10,6 +10,7 @@ namespace StraySwarm.Editor
 {
     /// <summary>
     /// Master tool to automatically generate and wire all visual HUD elements onto the Scene Canvas.
+    /// Preserves existing PauseButton / PausePanel components while scaffolding Level Title, Timer, Coins, and Quota.
     /// Menu: Stray Swarm -> 🎨 Setup Complete Visual HUD (Canvas)
     /// </summary>
     public static class CreateCompleteHUDEditor
@@ -80,25 +81,8 @@ namespace StraySwarm.Editor
             coinRect.anchorMin = new Vector2(1, 0.5f);
             coinRect.anchorMax = new Vector2(1, 0.5f);
             coinRect.pivot = new Vector2(1, 0.5f);
-            coinRect.anchoredPosition = new Vector2(-120, 0);
+            coinRect.anchoredPosition = new Vector2(-40, 0);
             coinRect.sizeDelta = new Vector2(180, 60);
-
-            // D. Pause Button (Top Far Right)
-            Transform pauseBtn = FindOrCreateUIChild(topBar, "PauseButton");
-            Button pButton = EnsureButton(pauseBtn);
-            RectTransform pauseRect = pauseBtn.GetComponent<RectTransform>();
-            pauseRect.anchorMin = new Vector2(1, 0.5f);
-            pauseRect.anchorMax = new Vector2(1, 0.5f);
-            pauseRect.pivot = new Vector2(1, 0.5f);
-            pauseRect.anchoredPosition = new Vector2(-30, 0);
-            pauseRect.sizeDelta = new Vector2(70, 70);
-
-            Transform pLabel = FindOrCreateUIChild(pauseBtn, "Label");
-            TextMeshProUGUI pText = EnsureTMP(pLabel, "⏸", 32, FontStyles.Bold, TextAlignmentOptions.Center);
-            RectTransform pLabelRect = pLabel.GetComponent<RectTransform>();
-            pLabelRect.anchorMin = Vector2.zero;
-            pLabelRect.anchorMax = Vector2.one;
-            pLabelRect.sizeDelta = Vector2.zero;
 
             // 4. Setup Status Sub-Bar (Below Top Bar)
             Transform statusSubBar = FindOrCreateUIChild(root, "StatusSubBar");
@@ -120,83 +104,21 @@ namespace StraySwarm.Editor
             quotaRect.anchoredPosition = new Vector2(40, 0);
             quotaRect.sizeDelta = new Vector2(320, 50);
 
-            // 5. Setup Pause Panel
-            Transform pausePanel = FindOrCreateUIChild(root, "PausePanel");
-            Image pauseBg = pausePanel.GetComponent<Image>();
-            if (pauseBg == null) pauseBg = pausePanel.gameObject.AddComponent<Image>();
-            pauseBg.color = new Color(0f, 0f, 0f, 0.75f);
-            RectTransform pausePanelRect = pausePanel.GetComponent<RectTransform>();
-            pausePanelRect.anchorMin = Vector2.zero;
-            pausePanelRect.anchorMax = Vector2.one;
-            pausePanelRect.sizeDelta = Vector2.zero;
-
-            Transform pauseTitle = FindOrCreateUIChild(pausePanel, "PauseTitle");
-            EnsureTMP(pauseTitle, "GAME PAUSED", 54, FontStyles.Bold, TextAlignmentOptions.Center);
-            RectTransform pTitleRect = pauseTitle.GetComponent<RectTransform>();
-            pTitleRect.anchorMin = new Vector2(0.5f, 0.7f);
-            pTitleRect.anchorMax = new Vector2(0.5f, 0.7f);
-            pTitleRect.sizeDelta = new Vector2(500, 100);
-
-            // Resume Button
-            Transform resumeBtn = FindOrCreateUIChild(pausePanel, "ResumeButton");
-            EnsureButton(resumeBtn);
-            RectTransform resumeRect = resumeBtn.GetComponent<RectTransform>();
-            resumeRect.anchorMin = new Vector2(0.5f, 0.52f);
-            resumeRect.anchorMax = new Vector2(0.5f, 0.52f);
-            resumeRect.sizeDelta = new Vector2(320, 80);
-            Transform resumeLabel = FindOrCreateUIChild(resumeBtn, "Label");
-            EnsureTMP(resumeLabel, "▶ RESUME", 34, FontStyles.Bold, TextAlignmentOptions.Center);
-
-            // Restart Button in Pause Panel
-            Transform restartBtn = FindOrCreateUIChild(pausePanel, "PauseRestartButton");
-            EnsureButton(restartBtn);
-            RectTransform pRestartRect = restartBtn.GetComponent<RectTransform>();
-            pRestartRect.anchorMin = new Vector2(0.5f, 0.42f);
-            pRestartRect.anchorMax = new Vector2(0.5f, 0.42f);
-            pRestartRect.sizeDelta = new Vector2(320, 80);
-            Transform pRestartLabel = FindOrCreateUIChild(restartBtn, "Label");
-            EnsureTMP(pRestartLabel, "🔄 RESTART", 34, FontStyles.Bold, TextAlignmentOptions.Center);
-
-            // Mute Button in Pause Panel
-            Transform muteBtn = FindOrCreateUIChild(pausePanel, "MuteButton");
-            EnsureButton(muteBtn);
-            RectTransform muteRect = muteBtn.GetComponent<RectTransform>();
-            muteRect.anchorMin = new Vector2(0.5f, 0.32f);
-            muteRect.anchorMax = new Vector2(0.5f, 0.32f);
-            muteRect.sizeDelta = new Vector2(320, 80);
-            Transform muteLabel = FindOrCreateUIChild(muteBtn, "Label");
-            EnsureTMP(muteLabel, "🔊 MUTE AUDIO", 34, FontStyles.Bold, TextAlignmentOptions.Center);
-
-            pausePanel.gameObject.SetActive(false); // Hide pause panel by default
-
-            // 6. Connect Button Listeners
-            UIManager uiManager = Object.FindAnyObjectByType<UIManager>();
-            if (uiManager != null)
+            // 5. Clean up any accidental duplicate PauseButton inside TopHUDBar
+            Transform duplicatePauseBtn = topBar.Find("PauseButton");
+            if (duplicatePauseBtn != null)
             {
-                pButton.onClick.RemoveAllListeners();
-                UnityEditor.Events.UnityEventTools.AddPersistentListener(pButton.onClick, uiManager.TogglePause);
-
-                Button rBtn = resumeBtn.GetComponent<Button>();
-                rBtn.onClick.RemoveAllListeners();
-                UnityEditor.Events.UnityEventTools.AddPersistentListener(rBtn.onClick, uiManager.OnResumeButtonClicked);
-
-                Button prBtn = restartBtn.GetComponent<Button>();
-                prBtn.onClick.RemoveAllListeners();
-                UnityEditor.Events.UnityEventTools.AddPersistentListener(prBtn.onClick, uiManager.OnRestartButtonClicked);
-
-                Button mBtn = muteBtn.GetComponent<Button>();
-                mBtn.onClick.RemoveAllListeners();
-                UnityEditor.Events.UnityEventTools.AddPersistentListener(mBtn.onClick, uiManager.OnMuteToggleClicked);
+                Object.DestroyImmediate(duplicatePauseBtn.gameObject);
             }
 
-            // 7. Auto-Wire Scene References
+            // 6. Auto-Wire Scene References
             AutoWireSceneReferences.AutoWireAll();
 
             EditorUtility.SetDirty(canvas.gameObject);
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene());
 
             Debug.Log("🎉 [CreateCompleteHUDEditor] Visual HUD setup complete!");
-            EditorUtility.DisplayDialog("Stray Swarm HUD", "Successfully created and wired the visual HUD elements:\n\n• Level Title (Top Left)\n• Timer (Top Center)\n• Coin Counter (Top Right)\n• Pause Button & Pause Menu\n• Quota Progress Counter\n\nTarget animals are now shown in the floating cloud speech bubble above each Rescue Van!", "Awesome!");
+            EditorUtility.DisplayDialog("Stray Swarm HUD", "Successfully synced all HUD elements:\n\n• Level Title (Top Left)\n• Timer (Top Center)\n• Coin Counter (Top Right)\n• Quota Progress Counter (Sub-Bar)\n\nYour existing Pause Button & Pause Menu have been preserved intact!", "Awesome!");
         }
 
         private static Transform FindOrCreateUIChild(Transform parent, string name)
@@ -227,17 +149,6 @@ namespace StraySwarm.Editor
             tmp.alignment = align;
             tmp.color = Color.white;
             return tmp;
-        }
-
-        private static Button EnsureButton(Transform target)
-        {
-            Image img = target.GetComponent<Image>();
-            if (img == null) img = target.gameObject.AddComponent<Image>();
-            img.color = new Color(0.2f, 0.2f, 0.2f, 0.85f);
-
-            Button btn = target.GetComponent<Button>();
-            if (btn == null) btn = target.gameObject.AddComponent<Button>();
-            return btn;
         }
     }
 }
