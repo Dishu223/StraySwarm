@@ -176,33 +176,24 @@ namespace StraySwarm.Gameplay
         {
             if (_spawnPoints.Count == 0) return;
 
-            Vector3 playerPos = GetPlayerPosition();
-
-            while (_liveAnimalsOnMap.Count < _maxConcurrentOnMap && _scheduledQueue.Count > 0)
+            // Populate each spawn point exactly ONCE with scheduled/allowed animals
+            foreach (var sp in _spawnPoints)
             {
-                ScheduledWaveSpawn nextSpawn = _scheduledQueue.Peek();
-                
-                // Find the best clustered spawn point adjacent to matching species!
-                AnimalSpawnPoint targetPoint = FindBestClusteredSpawnPoint(nextSpawn.Type, playerPos);
+                if (sp == null || sp.IsOccupied || sp.CurrentAnimal != null) continue;
+                if (_scheduledQueue.Count == 0) break;
 
-                if (targetPoint == null || targetPoint.IsOccupied)
-                {
-                    break; // No suitable point open right now; wait for player/delivery
-                }
-
-                _scheduledQueue.Dequeue();
-
+                ScheduledWaveSpawn nextSpawn = _scheduledQueue.Dequeue();
                 GameObject prefab = GetAnimalPrefab(nextSpawn.Type);
                 if (prefab != null)
                 {
-                    GameObject animalGo = Instantiate(prefab, targetPoint.transform.position, Quaternion.identity);
+                    GameObject animalGo = Instantiate(prefab, sp.transform.position, Quaternion.identity);
                     FollowerBehavior animal = animalGo.GetComponent<FollowerBehavior>();
                     if (animal != null)
                     {
                         animal.AnimalType = nextSpawn.Type;
                         _liveAnimalsOnMap.Add(animal);
-                        targetPoint.IsOccupied = true;
-                        targetPoint.CurrentAnimal = animal;
+                        sp.IsOccupied = true;
+                        sp.CurrentAnimal = animal;
                     }
                     _totalSpawned++;
                 }
@@ -365,9 +356,6 @@ namespace StraySwarm.Gameplay
             _totalDelivered++;
 
             Debug.Log($"🐾 [WaveSpawner] Delivered ({_totalDelivered}/{_totalQuota})");
-
-            // Refill the wave as animals are delivered to crates
-            SpawnWaveToCap();
 
             if (_totalDelivered >= _totalQuota)
             {

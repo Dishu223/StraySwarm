@@ -31,8 +31,10 @@ namespace StraySwarm.Gameplay
         {
             if (!Application.isPlaying) return;
             if (_tailManager == null) _tailManager = FindAnyObjectByType<TailManager>();
-            if (_attachedCrate == null) _attachedCrate = GetComponent<DeliveryCrate>();
+            if (_vanQueue == null) _vanQueue = GetComponent<VanQueue>();
             if (_vanQueue == null) _vanQueue = FindAnyObjectByType<VanQueue>();
+            if (_vanQueue == null) _vanQueue = gameObject.AddComponent<VanQueue>();
+            if (_attachedCrate == null) _attachedCrate = GetComponent<DeliveryCrate>();
         }
 
         private bool _isPlayerInside = false;
@@ -67,21 +69,21 @@ namespace StraySwarm.Gameplay
         {
             if (!_isPlayerInside || _tailManager == null) return;
 
-            // 1. Try attached Delivery Crate (Multi-Station System)
-            if (_attachedCrate != null && !_attachedCrate.IsFull)
-            {
-                _tailManager.DeliverToCrate(_attachedCrate);
-                return;
-            }
-
-            // 2. Fallback to Van Queue (Single Driving Van)
+            // 1. Try Van Queue (Rescue Van)
             if (_vanQueue != null)
             {
                 VanController currentVan = _vanQueue.GetCurrentVan();
                 if (currentVan != null && !currentVan.IsFull && !currentVan.IsDrivingAway && currentVan.IsParked)
                 {
                     _tailManager.DeliverToVan(currentVan);
+                    return;
                 }
+            }
+
+            // 2. Fallback to attached Delivery Crate
+            if (_attachedCrate != null && !_attachedCrate.IsFull)
+            {
+                _tailManager.DeliverToCrate(_attachedCrate);
             }
         }
     }

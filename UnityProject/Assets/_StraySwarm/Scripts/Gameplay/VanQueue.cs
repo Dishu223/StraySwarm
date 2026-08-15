@@ -1,10 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
+using StraySwarm.Core;
+using StraySwarm.Data;
 
 namespace StraySwarm.Gameplay
 {
     /// <summary>
     /// Controls the sequence of vans arriving at the Rescue Station.
+    /// Automatically derives van demand from level data and animates smooth arrival/departure.
     /// </summary>
     public class VanQueue : MonoBehaviour
     {
@@ -13,17 +16,54 @@ namespace StraySwarm.Gameplay
         
         [Header("Level Design")]
         [Tooltip("The sequence of animal species vans for this level.")]
-        [SerializeField] private List<Data.AnimalType> _levelVanSequence = new List<Data.AnimalType> { Data.AnimalType.Puppy, Data.AnimalType.Kitten, Data.AnimalType.Puppy };
+        [SerializeField] private List<AnimalType> _levelVanSequence = new List<AnimalType>();
         
         private int _currentVanIndex = 0;
         private VanController _activeVan;
 
+        private void Awake()
+        {
+            if (_station == null) _station = GetComponent<RescueStation>();
+            if (_station == null) _station = FindAnyObjectByType<RescueStation>();
+
+            if (_vanPrefab == null)
+            {
+#if UNITY_EDITOR
+                _vanPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_StraySwarm/Prefabs/Core/VanPrefab.prefab");
+#endif
+            }
+        }
+
         private void Start()
         {
+            if (_station == null) _station = GetComponent<RescueStation>();
             if (_station == null) _station = FindAnyObjectByType<RescueStation>();
-            
-            // Wait a tiny bit before spawning the first van so the game has time to load
-            Invoke(nameof(SpawnNextVan), 0.5f);
+
+            BuildVanSequenceFromLevelData();
+
+            // Wait a tiny bit before spawning the first van so the level is fully initialized
+            Invoke(nameof(SpawnNextVan), 0.3f);
+        }
+
+        private void BuildVanSequenceFromLevelData()
+        {
+            if (_levelVanSequence != null && _levelVanSequence.Count > 0) return;
+
+            _levelVanSequence = new List<AnimalType>();
+            LevelData data = LevelManager.Instance != null ? LevelManager.Instance.GetCurrentLevelData() : null;
+
+            if (data != null && data.AllowedAnimalTypes != null && data.AllowedAnimalTypes.Count > 0)
+            {
+                foreach (var species in data.AllowedAnimalTypes)
+                {
+                    _levelVanSequence.Add(species);
+                }
+            }
+            else
+            {
+                _levelVanSequence.Add(AnimalType.Puppy);
+                _levelVanSequence.Add(AnimalType.Kitten);
+            }
         }
 
         public VanController GetCurrentVan()
@@ -36,37 +76,51 @@ namespace StraySwarm.Gameplay
             if (_currentVanIndex >= _levelVanSequence.Count)
             {
                 Debug.Log("🎉 [VanQueue] LEVEL COMPLETE! All vans filled! 🎉");
-                
-                // Tell the GameManager we won!
-                Core.GameManager gm = FindAnyObjectByType<Core.GameManager>();
+                GameManager gm = FindAnyObjectByType<GameManager>();
                 if (gm != null) gm.WinGame();
-                
                 return;
             }
 
-            Data.AnimalType nextType = _levelVanSequence[_currentVanIndex];
+            if (_station == null) _station = FindAnyObjectByType<RescueStation>();
+            if (_station == null) return;
+
+            Transform parkingTransform = _station.VanParkingSpot != null ? _station.VanParkingSpot : _station.transform;
+            Vector3 parkPos = parkingTransform.position;
+            Vector3 spawnPos = parkPos + (Vector3.left * 12f);
+
+            if (_vanPrefab == null)
+            {
+#if UNITY_EDITOR
+                _vanPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_StraySwarm/Prefabs/Core/VanPrefab.prefab");
+#endif
+            }
+
+            if (_vanPrefab == null)
+            {
+                Debug.LogError("[VanQueue] VanPrefab is missing! Cannot spawn rescue van.");
+                return;
+            }
+
+            AnimalType nextType = _levelVanSequence[_currentVanIndex];
             _currentVanIndex++;
 
-            // Spawn the van off-screen to the left, and drive it to the parking spot
-            Vector3 spawnPos = _station.VanParkingSpot.position + (Vector3.left * 15f);
             GameObject vanObj = Instantiate(_vanPrefab, spawnPos, Quaternion.identity);
+            vanObj.name = $"RescueVan_{nextType}";
             
             _activeVan = vanObj.GetComponent<VanController>();
-            _activeVan.SetTargetAnimal(nextType);
-            
-            // For testing, just need 2 animals to fill a van
-            _activeVan.Capacity = 2; 
-
-            // Simple drive-in animation
-            StartCoroutine(DriveInRoutine(_activeVan.transform, _station.VanParkingSpot.position, _activeVan));
+            if (_activeVan != null)
+            {
+                _activeVan.SetTargetAnimal(nextType);
+                _activeVan.Capacity = 3;
+                StartCoroutine(DriveInRoutine(_activeVan.transform, parkPos, _activeVan));
+            }
         }
 
         private System.Collections.IEnumerator DriveInRoutine(Transform vanTransform, Vector3 target, VanController vanController)
         {
-            float speed = 15f;
-            while (Vector3.Distance(vanTransform.position, target) > 0.1f)
+            float speed = 14f;
+            while (vanTransform != null && Vector3.Distance(vanTransform.position, target) > 0.1f)
             {
-                // If van was told to drive away mid-arrival, cancel drive-in immediately!
                 if (vanController != null && vanController.IsDrivingAway) yield break;
 
                 vanTransform.position = Vector3.MoveTowards(vanTransform.position, target, speed * Time.deltaTime);
@@ -79,8 +133,10 @@ namespace StraySwarm.Gameplay
                 if (vanController != null)
                 {
                     vanController.SetParked();
-                    // If player was already waiting at the station, trigger delivery!
-                    _station.AttemptDelivery();
+                    if (_station != null)
+                    {
+                        _station.AttemptDelivery();
+                    }
                 }
             }
         }
