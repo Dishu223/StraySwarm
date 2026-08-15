@@ -202,6 +202,12 @@ namespace StraySwarm.Editor
         private static Transform FindOrCreateUIChild(Transform parent, string name)
         {
             Transform child = parent.Find(name);
+            if (child != null && !(child is RectTransform))
+            {
+                Object.DestroyImmediate(child.gameObject);
+                child = null;
+            }
+
             if (child == null)
             {
                 GameObject obj = new GameObject(name, typeof(RectTransform));
