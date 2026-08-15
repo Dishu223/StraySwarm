@@ -33,10 +33,10 @@ namespace StraySwarm.Editor
             sr.sortingOrder = 10; // Above tilemap
             root.transform.localScale = new Vector3(0.85f, 0.85f, 1f);
 
-            // 3. Collider
+            // 3. Collider (Compact 0.35x0.35 so player only touches the single current tile)
             BoxCollider2D col = root.AddComponent<BoxCollider2D>();
             col.isTrigger = true;
-            col.size = new Vector2(0.9f, 0.9f);
+            col.size = new Vector2(0.35f, 0.35f);
 
             // 4. PlayerController & InputHandler
             InputHandler input = root.AddComponent<InputHandler>();

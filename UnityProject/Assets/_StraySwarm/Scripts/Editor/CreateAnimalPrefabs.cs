@@ -54,10 +54,10 @@ namespace StraySwarm.Editor
                 // Scale (0.55 on x,y for compact, adorable conga-line followers)
                 go.transform.localScale = new Vector3(0.55f, 0.55f, 1f);
 
-                // Circle Collider 2D
+                // Circle Collider 2D (Compact 0.3f radius for precise single-tile collection)
                 CircleCollider2D col = go.AddComponent<CircleCollider2D>();
                 col.isTrigger = true;
-                col.radius = 0.5f;
+                col.radius = 0.3f;
 
                 // Follower Behavior
                 FollowerBehavior follower = go.AddComponent<FollowerBehavior>();
