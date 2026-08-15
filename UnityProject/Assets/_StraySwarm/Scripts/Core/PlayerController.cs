@@ -32,11 +32,21 @@ namespace StraySwarm.Core
             if (_animator == null) _animator = GetComponent<Animator>();
             if (_cubeWobble == null) _cubeWobble = GetComponent<Gameplay.CubeWobble>();
 
-            // Snap the player to the CLOSEST grid node to where you dragged them in the Scene!
-            _currentNode = _gridManager.GetClosestNode(transform.position);
-            if (_currentNode != null)
+            // 1. Check for dedicated PlayerSpawnPoint on the map
+            var psp = FindAnyObjectByType<Gameplay.PlayerSpawnPoint>();
+            if (psp != null)
             {
-                transform.position = _currentNode.WorldPosition;
+                transform.position = psp.transform.position;
+            }
+
+            // 2. Snap to the closest grid node
+            if (_gridManager != null)
+            {
+                _currentNode = _gridManager.GetClosestNode(transform.position);
+                if (_currentNode != null)
+                {
+                    transform.position = _currentNode.WorldPosition;
+                }
             }
         }
 

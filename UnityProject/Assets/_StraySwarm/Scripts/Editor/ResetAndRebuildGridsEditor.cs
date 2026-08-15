@@ -12,7 +12,7 @@ using StraySwarm.Utils;
 namespace StraySwarm.Editor
 {
     /// <summary>
-    /// Master tool to reset and standardize all level grids and tilemaps across the entire project.
+    /// Master tool to reset, standardize, and wire all level grids, prefabs, and playlists.
     /// Menu: Stray Swarm -> 🔄 Reset & Rebuild Standardized Grids (Level 1 & 2)
     /// </summary>
     public static class ResetAndRebuildGridsEditor
@@ -22,9 +22,11 @@ namespace StraySwarm.Editor
         {
             string prefabDir = "Assets/_StraySwarm/Prefabs/Levels";
             string levelDataDir = "Assets/_StraySwarm/Data/Levels";
+            string world01Dir = "Assets/_StraySwarm/Data/Levels/World_01_Desert";
 
             if (!Directory.Exists(prefabDir)) Directory.CreateDirectory(prefabDir);
             if (!Directory.Exists(levelDataDir)) Directory.CreateDirectory(levelDataDir);
+            if (!Directory.Exists(world01Dir)) Directory.CreateDirectory(world01Dir);
 
             // Load white tile asset
             TileBase whiteTile = AssetDatabase.LoadAssetAtPath<TileBase>("Assets/_StraySwarm/Art/Square.asset");
@@ -37,7 +39,6 @@ namespace StraySwarm.Editor
                 }
             }
 
-            GameObject spawnPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_StraySwarm/Prefabs/Environment/AnimalSpawnPoint.prefab");
             GameObject stationPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_StraySwarm/Prefabs/Environment/RescueStation.prefab");
 
             // ==========================================
@@ -74,6 +75,12 @@ namespace StraySwarm.Editor
             {
                 if (whiteTile != null) tilemap01.SetTile(cell, whiteTile);
             }
+
+            // Player Spawn Point
+            GameObject psp01 = new GameObject("PlayerSpawnPoint");
+            psp01.transform.SetParent(map01Root.transform, false);
+            psp01.transform.localPosition = new Vector3(-3.5f, 3.5f, 0f);
+            psp01.AddComponent<PlayerSpawnPoint>();
 
             // Spawn Points container
             GameObject spContainer01 = new GameObject("AnimalSpawnPoints");
@@ -122,65 +129,66 @@ namespace StraySwarm.Editor
             GameObject level1Prefab = PrefabUtility.SaveAsPrefabAsset(map01Root, prefab01Path);
             Object.DestroyImmediate(map01Root);
 
-            // Update/Create Level_01.asset
-            string data01Path = $"{levelDataDir}/Level_01.asset";
-            LevelData data01 = AssetDatabase.LoadAssetAtPath<LevelData>(data01Path);
-            if (data01 == null) data01 = ScriptableObject.CreateInstance<LevelData>();
-            data01.LevelID = 1;
-            data01.LevelName = "Desert Gateway";
-            data01.World = WorldTheme.Desert;
-            data01.TotalAnimalsToRescue = 10;
-            data01.MaxConcurrentOnMap = 4;
-            data01.TimeLimit = 60f;
-            data01.CoinReward = 50;
-            data01.MapPrefab = level1Prefab;
-            data01.AllowedAnimalTypes = new List<AnimalType> { AnimalType.Puppy, AnimalType.Kitten };
-            if (!File.Exists(data01Path))
+            // Update Level_01.asset in World_01_Desert
+            string data01WorldPath = $"{world01Dir}/Level_01.asset";
+            LevelData data01 = AssetDatabase.LoadAssetAtPath<LevelData>(data01WorldPath);
+            if (data01 != null)
             {
-                AssetDatabase.CreateAsset(data01, data01Path);
-            }
-            else
-            {
+                data01.MapPrefab = level1Prefab;
+                data01.TotalAnimalsToRescue = 10;
+                data01.MaxConcurrentOnMap = 4;
+                data01.TimeLimit = 60f;
                 EditorUtility.SetDirty(data01);
             }
 
-            // ==========================================
-            // 2. CLEAN SAMPLE SCENE GRID & TILEMAP
-            // ==========================================
-            var sceneTilemaps = Object.FindObjectsByType<Tilemap>(FindObjectsInactive.Include);
-            foreach (var tm in sceneTilemaps)
+            // Update Level_02.asset in World_01_Desert
+            string prefab02Path = $"{prefabDir}/Level_02_Map.prefab";
+            GameObject level2Prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefab02Path);
+            string data02WorldPath = $"{world01Dir}/Level_02.asset";
+            LevelData data02 = AssetDatabase.LoadAssetAtPath<LevelData>(data02WorldPath);
+            if (data02 != null && level2Prefab != null)
             {
-                if (tm.name == "FloorTilemap" || tm.transform.parent?.name == "Grid")
-                {
-                    Undo.RecordObject(tm, "Standardize Tilemap Anchor");
-                    tm.tileAnchor = new Vector3(0.5f, 0.5f, 0f);
-                    
-                    // Repaint with white tiles
-                    BoundsInt bounds = tm.cellBounds;
-                    for (int x = bounds.xMin; x <= bounds.xMax; x++)
-                    {
-                        for (int y = bounds.yMin; y <= bounds.yMax; y++)
-                        {
-                            Vector3Int c = new Vector3Int(x, y, 0);
-                            if (tm.HasTile(c) && whiteTile != null)
-                            {
-                                tm.SetTile(c, whiteTile);
-                            }
-                        }
-                    }
-                    EditorUtility.SetDirty(tm);
-                }
+                data02.MapPrefab = level2Prefab;
+                data02.TotalAnimalsToRescue = 12;
+                data02.MaxConcurrentOnMap = 5;
+                data02.TimeLimit = 60f;
+                EditorUtility.SetDirty(data02);
             }
 
-            // 3. Snap all objects in scene to exact 0.5, 0.5 center
-            SnapToGridEditor.SnapAllObjects();
+            // Ensure PlayerSpawnPoint exists in Level_02_Map.prefab
+            if (level2Prefab != null)
+            {
+                GameObject l2Instance = (GameObject)PrefabUtility.InstantiatePrefab(level2Prefab);
+                if (l2Instance.GetComponentInChildren<PlayerSpawnPoint>() == null)
+                {
+                    GameObject psp02 = new GameObject("PlayerSpawnPoint");
+                    psp02.transform.SetParent(l2Instance.transform, false);
+                    psp02.transform.localPosition = new Vector3(-3.5f, 4.5f, 0f);
+                    psp02.AddComponent<PlayerSpawnPoint>();
+                    PrefabUtility.SaveAsPrefabAsset(l2Instance, prefab02Path);
+                }
+                Object.DestroyImmediate(l2Instance);
+            }
+
+            // ==========================================
+            // 2. CLEAN STATIC PROTOTYPES FROM SAMPLE SCENE
+            // ==========================================
+            var oldRoots = new string[] { "Grid", "AnimalSpawnPoints", "Stations", "Obstacles", "RescueStation", "NumberedWall_3", "OneWayArrow_Down" };
+            foreach (var rName in oldRoots)
+            {
+                GameObject obj = GameObject.Find(rName);
+                if (obj != null && obj.transform.parent == null)
+                {
+                    Undo.DestroyObjectImmediate(obj);
+                }
+            }
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
 
-            Debug.Log("🎉 [ResetAndRebuildGridsEditor] Level 1 & 2 grids standardized to Tile Anchor (0.5, 0.5) with clean white tiles!");
-            EditorUtility.DisplayDialog("Stray Swarm", "Successfully reset and rebuilt standardized grids for Level 1 & 2!\n\nAll Tilemaps now strictly use Tile Anchor (0.5, 0.5) with matching pure white tiles.", "Awesome!");
+            Debug.Log("🎉 [ResetAndRebuildGridsEditor] Level 1 & Level 2 prefabs and World 1 data fully standardized with PlayerSpawnPoints!");
+            EditorUtility.DisplayDialog("Stray Swarm", "Successfully standardized Level 1 & 2 Prefabs, linked MapPrefabs in World 1, added PlayerSpawnPoints, and cleaned the Scene shell!\n\nPress Play to test Level 1 or Level 2 seamlessly!", "Awesome!");
         }
     }
 }

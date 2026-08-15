@@ -113,6 +113,12 @@ namespace StraySwarm.Editor
             GameObject stationsContainer = new GameObject("Stations");
             stationsContainer.transform.SetParent(mapRoot.transform);
 
+            // Player Spawn Point
+            GameObject psp = new GameObject("PlayerSpawnPoint");
+            psp.transform.SetParent(mapRoot.transform, false);
+            psp.transform.localPosition = new Vector3(0.5f, 0.5f, 0f);
+            psp.AddComponent<Gameplay.PlayerSpawnPoint>();
+
             // Obstacles container
             GameObject obstaclesContainer = new GameObject("Obstacles");
             obstaclesContainer.transform.SetParent(mapRoot.transform);

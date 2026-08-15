@@ -33,6 +33,7 @@ namespace StraySwarm.Editor
                 if (t == null) continue;
 
                 bool isLevelObj = t.GetComponent<AnimalSpawnPoint>() != null ||
+                                  t.GetComponent<PlayerSpawnPoint>() != null ||
                                   t.GetComponent<NumberedWall>() != null ||
                                   t.GetComponent<OneWayArrow>() != null ||
                                   t.GetComponent<RescueStation>() != null ||
