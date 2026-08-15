@@ -42,6 +42,23 @@ namespace StraySwarm.Core
             }
         }
 
+        private void OnEnable()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private void OnDisable()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            _spawnedMapInstance = null;
+            RebuildFlatPlaylist();
+            SpawnActiveLevelMap();
+        }
+
         public void SpawnActiveLevelMap()
         {
             LevelData data = GetCurrentLevelData();
@@ -52,17 +69,15 @@ namespace StraySwarm.Core
             {
                 Destroy(_spawnedMapInstance);
             }
-            else
+
+            // Remove any prototype root objects if present in scene
+            var oldRoots = new string[] { "Grid", "AnimalSpawnPoints", "Stations", "Obstacles", "RescueStation", "NumberedWall_3", "OneWayArrow_Down" };
+            foreach (var rName in oldRoots)
             {
-                // Remove prototype root objects if present
-                var oldRoots = new string[] { "Grid", "AnimalSpawnPoints", "Stations", "Obstacles", "RescueStation", "NumberedWall_3", "OneWayArrow_Down" };
-                foreach (var rName in oldRoots)
+                GameObject obj = GameObject.Find(rName);
+                if (obj != null && obj.transform.parent == null)
                 {
-                    GameObject obj = GameObject.Find(rName);
-                    if (obj != null && obj.transform.parent == null)
-                    {
-                        Destroy(obj);
-                    }
+                    Destroy(obj);
                 }
             }
 
@@ -107,6 +122,12 @@ namespace StraySwarm.Core
             if (player != null)
             {
                 player.SnapToClosestNode();
+            }
+
+            // 5. Initialize Wave Spawner
+            if (Gameplay.WaveSpawner.Instance != null)
+            {
+                Gameplay.WaveSpawner.Instance.InitializeWaveSystem();
             }
         }
 

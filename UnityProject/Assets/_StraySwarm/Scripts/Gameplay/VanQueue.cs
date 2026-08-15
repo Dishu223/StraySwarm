@@ -7,16 +7,22 @@ namespace StraySwarm.Gameplay
 {
     /// <summary>
     /// Controls the sequence of vans arriving at the Rescue Station.
-    /// Automatically derives van demand from level data and animates smooth arrival/departure.
+    /// Perfectly synchronizes van capacities with the exact animals present on the map.
     /// </summary>
     public class VanQueue : MonoBehaviour
     {
+        [System.Serializable]
+        public struct VanDemand
+        {
+            public AnimalType Type;
+            public int Capacity;
+        }
+
         [SerializeField] private RescueStation _station;
         [SerializeField] private GameObject _vanPrefab; 
         
-        [Header("Level Design")]
-        [Tooltip("The sequence of animal species vans for this level.")]
-        [SerializeField] private List<AnimalType> _levelVanSequence = new List<AnimalType>();
+        [Header("Runtime Van Schedule")]
+        [SerializeField] private List<VanDemand> _vanDemands = new List<VanDemand>();
         
         private int _currentVanIndex = 0;
         private VanController _activeVan;
@@ -39,31 +45,59 @@ namespace StraySwarm.Gameplay
             if (_station == null) _station = GetComponent<RescueStation>();
             if (_station == null) _station = FindAnyObjectByType<RescueStation>();
 
-            BuildVanSequenceFromLevelData();
-
-            // Wait a tiny bit before spawning the first van so the level is fully initialized
-            Invoke(nameof(SpawnNextVan), 0.3f);
+            // Small delay to let WaveSpawner instantiate map animals first
+            Invoke(nameof(InitializeVanSchedule), 0.15f);
         }
 
-        private void BuildVanSequenceFromLevelData()
+        public void InitializeVanSchedule()
         {
-            if (_levelVanSequence != null && _levelVanSequence.Count > 0) return;
+            BuildVanSequenceFromLevelAnimals();
+            SpawnNextVan();
+        }
 
-            _levelVanSequence = new List<AnimalType>();
-            LevelData data = LevelManager.Instance != null ? LevelManager.Instance.GetCurrentLevelData() : null;
+        private void BuildVanSequenceFromLevelAnimals()
+        {
+            _vanDemands.Clear();
+            _currentVanIndex = 0;
 
-            if (data != null && data.AllowedAnimalTypes != null && data.AllowedAnimalTypes.Count > 0)
+            // 1. Count all alive animals on the map
+            var allAnimals = FindObjectsByType<FollowerBehavior>(FindObjectsInactive.Exclude);
+            Dictionary<AnimalType, int> counts = new Dictionary<AnimalType, int>();
+
+            foreach (var a in allAnimals)
             {
-                foreach (var species in data.AllowedAnimalTypes)
+                if (a != null)
                 {
-                    _levelVanSequence.Add(species);
+                    if (!counts.ContainsKey(a.AnimalType)) counts[a.AnimalType] = 0;
+                    counts[a.AnimalType]++;
                 }
             }
-            else
+
+            // 2. If no animals found on map yet, fallback to LevelData
+            if (counts.Count == 0)
             {
-                _levelVanSequence.Add(AnimalType.Puppy);
-                _levelVanSequence.Add(AnimalType.Kitten);
+                LevelData data = LevelManager.Instance != null ? LevelManager.Instance.GetCurrentLevelData() : null;
+                var allowed = data != null ? data.AllowedAnimalTypes : null;
+                if (allowed == null || allowed.Count == 0) allowed = new List<AnimalType> { AnimalType.Puppy, AnimalType.Kitten };
+                foreach (var t in allowed)
+                {
+                    counts[t] = 3;
+                }
             }
+
+            // 3. Split counts into van deliveries (max 3 per van)
+            foreach (var kvp in counts)
+            {
+                int remaining = kvp.Value;
+                while (remaining > 0)
+                {
+                    int cap = Mathf.Min(3, remaining);
+                    _vanDemands.Add(new VanDemand { Type = kvp.Key, Capacity = cap });
+                    remaining -= cap;
+                }
+            }
+
+            Debug.Log($"🚐 [VanQueue] Built {_vanDemands.Count} vans perfectly matching {allAnimals.Length} map animals.");
         }
 
         public VanController GetCurrentVan()
@@ -73,9 +107,9 @@ namespace StraySwarm.Gameplay
 
         public void SpawnNextVan()
         {
-            if (_currentVanIndex >= _levelVanSequence.Count)
+            if (_currentVanIndex >= _vanDemands.Count)
             {
-                Debug.Log("🎉 [VanQueue] LEVEL COMPLETE! All vans filled! 🎉");
+                Debug.Log("🎉 [VanQueue] ALL VANS FILLED! Triggering Victory! 🎉");
                 GameManager gm = FindAnyObjectByType<GameManager>();
                 if (gm != null) gm.WinGame();
                 return;
@@ -101,17 +135,17 @@ namespace StraySwarm.Gameplay
                 return;
             }
 
-            AnimalType nextType = _levelVanSequence[_currentVanIndex];
+            VanDemand demand = _vanDemands[_currentVanIndex];
             _currentVanIndex++;
 
             GameObject vanObj = Instantiate(_vanPrefab, spawnPos, Quaternion.identity);
-            vanObj.name = $"RescueVan_{nextType}";
+            vanObj.name = $"RescueVan_{demand.Type}";
             
             _activeVan = vanObj.GetComponent<VanController>();
             if (_activeVan != null)
             {
-                _activeVan.SetTargetAnimal(nextType);
-                _activeVan.Capacity = 3;
+                _activeVan.SetTargetAnimal(demand.Type);
+                _activeVan.Capacity = demand.Capacity;
                 StartCoroutine(DriveInRoutine(_activeVan.transform, parkPos, _activeVan));
             }
         }

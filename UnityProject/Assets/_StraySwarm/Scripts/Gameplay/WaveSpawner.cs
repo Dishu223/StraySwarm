@@ -68,14 +68,14 @@ namespace StraySwarm.Gameplay
 
             if (data != null)
             {
-                _totalQuota = data.TotalAnimalsToRescue;
+                _totalQuota = _spawnPoints.Count > 0 ? _spawnPoints.Count : data.TotalAnimalsToRescue;
                 _maxConcurrentOnMap = data.MaxConcurrentOnMap;
                 BuildDeterministicSchedule(data);
             }
             else
             {
                 // Fallback default schedule
-                _totalQuota = 12;
+                _totalQuota = _spawnPoints.Count > 0 ? _spawnPoints.Count : 12;
                 _maxConcurrentOnMap = 5;
                 BuildDefaultSchedule();
             }
