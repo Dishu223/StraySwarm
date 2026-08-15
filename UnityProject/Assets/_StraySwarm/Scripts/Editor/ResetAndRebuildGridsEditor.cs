@@ -28,6 +28,9 @@ namespace StraySwarm.Editor
             if (!Directory.Exists(levelDataDir)) Directory.CreateDirectory(levelDataDir);
             if (!Directory.Exists(world01Dir)) Directory.CreateDirectory(world01Dir);
 
+            // 0. Ensure PlayerCat prefab exists
+            CreatePlayerPrefab.GeneratePlayerPrefab();
+
             // Load white tile asset
             TileBase whiteTile = AssetDatabase.LoadAssetAtPath<TileBase>("Assets/_StraySwarm/Art/Square.asset");
             if (whiteTile == null)

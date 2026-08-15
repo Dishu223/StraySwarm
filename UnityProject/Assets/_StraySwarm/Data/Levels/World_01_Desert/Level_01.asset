@@ -15,12 +15,21 @@ MonoBehaviour:
   LevelID: 1
   LevelName: Desert - Stage 1
   World: 0
-  TimeLimit: 45
+  MapPrefab: {fileID: 2844081352143035982, guid: 7e81515841a48054ebff5c010d4670ea, type: 3}
+  TotalAnimalsToRescue: 10
+  MaxConcurrentOnMap: 4
+  AllowedAnimalTypes: 0000000001000000
+  SeedOffset: 0
+  FixedWaveSchedule: []
+  PlayerStartCell: {x: 0, y: 0}
+  TimeLimit: 60
   ThreeStarPercentage: 0.6
   TwoStarPercentage: 0.3
   CoinReward: 32
   AnimalSpawns: []
   Stations: []
+  OneWayArrows: []
+  NumberedWalls: []
   VanSequence:
   - Blue
   - Pink

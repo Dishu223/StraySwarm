@@ -18,6 +18,9 @@ namespace StraySwarm.Core
         [Header("Flat Playlist (Fallback / Auto-Populated)")]
         [SerializeField] private List<LevelData> _levelPlaylist = new List<LevelData>();
 
+        [Header("Player Configuration")]
+        [SerializeField] private GameObject _playerPrefab;
+
         public int CurrentWorldIndex { get; private set; } = 0;
         public int CurrentLevelIndex { get; private set; } = 0;
         public List<WorldData> Worlds => _worlds;
@@ -66,6 +69,45 @@ namespace StraySwarm.Core
             // 2. Instantiate new level map prefab
             _spawnedMapInstance = Instantiate(data.MapPrefab);
             _spawnedMapInstance.name = data.MapPrefab.name;
+
+            // 3. Rebuild Grid Graph from newly spawned map
+            if (GridManager.Instance != null)
+            {
+                GridManager.Instance.RebuildGrid();
+            }
+
+            // 4. Position or Spawn Player at PlayerSpawnPoint
+            Gameplay.PlayerSpawnPoint psp = _spawnedMapInstance.GetComponentInChildren<Gameplay.PlayerSpawnPoint>();
+            Vector3 startPos = psp != null ? psp.transform.position : new Vector3(0.5f, 0.5f, 0f);
+
+            PlayerController player = FindAnyObjectByType<PlayerController>();
+            if (player == null)
+            {
+                if (_playerPrefab == null)
+                {
+#if UNITY_EDITOR
+                    _playerPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_StraySwarm/Prefabs/Characters/PlayerCat.prefab");
+#endif
+                }
+
+                if (_playerPrefab != null)
+                {
+                    GameObject playerObj = Instantiate(_playerPrefab, startPos, Quaternion.identity);
+                    playerObj.name = "Player";
+                    player = playerObj.GetComponent<PlayerController>();
+                }
+            }
+            else
+            {
+                player.transform.position = startPos;
+                var sr = player.GetComponent<SpriteRenderer>();
+                if (sr != null) sr.sortingOrder = 10;
+            }
+
+            if (player != null)
+            {
+                player.SnapToClosestNode();
+            }
         }
 
         public void RebuildFlatPlaylist()

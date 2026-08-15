@@ -431,6 +431,7 @@ Transform:
   - {fileID: 5003298081067186900}
   - {fileID: 4261886695952510836}
   - {fileID: 2672448525532581647}
+  - {fileID: 886663474430948921}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5665568735469962648
@@ -684,6 +685,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bacfdc4f921d74e4e96e77263f318114, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.AnimalSpawnPoint
+--- !u!1 &6859870734331854206
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 886663474430948921}
+  - component: {fileID: 3634637099506372946}
+  m_Layer: 0
+  m_Name: PlayerSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &886663474430948921
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6859870734331854206}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.5, y: 4.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 338411329403110600}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3634637099506372946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6859870734331854206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f644a0679833293429b7fba580f3af06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.PlayerSpawnPoint
 --- !u!1 &7124400410658044662
 GameObject:
   m_ObjectHideFlags: 0
