@@ -7,34 +7,29 @@ namespace StraySwarm.Utils
     /// Ensures GameObjects (Player, Obstacles, Stations, SpawnPoints) stay snapped
     /// to the exact center of Tilemap path cells in Edit Mode.
     /// </summary>
-    [ExecuteInEditMode]
+    [ExecuteAlways]
     public class GridSnap : MonoBehaviour
     {
         public bool SnapOnUpdate = true;
 
         private void Update()
         {
-            if (!Application.isPlaying && SnapOnUpdate)
+            if (!Application.isPlaying && SnapOnUpdate && transform.hasChanged)
             {
                 SnapToPathCenter();
+                transform.hasChanged = false;
             }
         }
 
+        [ContextMenu("Snap to Path Center")]
         public void SnapToPathCenter()
         {
-            Tilemap tilemap = GetComponentInParent<Tilemap>() ?? Object.FindAnyObjectByType<Tilemap>();
-            if (tilemap != null && tilemap.tileAnchor.x > 0.1f)
+            float cx = Mathf.Floor(transform.position.x) + 0.5f;
+            float cy = Mathf.Floor(transform.position.y) + 0.5f;
+            Vector3 target = new Vector3(cx, cy, transform.position.z);
+            if ((transform.position - target).sqrMagnitude > 0.0001f)
             {
-                Vector3Int cell = tilemap.WorldToCell(transform.position);
-                Vector3 center = tilemap.GetCellCenterWorld(cell);
-                transform.position = new Vector3(center.x, center.y, transform.position.z);
-            }
-            else
-            {
-                // Standard cell center: (Floor(x) + 0.5, Floor(y) + 0.5)
-                float cx = Mathf.Floor(transform.position.x) + 0.5f;
-                float cy = Mathf.Floor(transform.position.y) + 0.5f;
-                transform.position = new Vector3(cx, cy, transform.position.z);
+                transform.position = target;
             }
         }
     }
