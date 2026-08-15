@@ -164,7 +164,11 @@ namespace StraySwarm.Gameplay
             if (vanTransform != null)
             {
                 vanTransform.position = target;
-                if (vanController != null)
+
+                // Brief 0.25s arrival settle pause before opening doors
+                yield return new WaitForSeconds(0.25f);
+
+                if (vanController != null && !vanController.IsDrivingAway)
                 {
                     vanController.SetParked();
                     if (_station != null)

@@ -69,18 +69,18 @@ namespace StraySwarm.Gameplay
         {
             if (!_isPlayerInside || _tailManager == null) return;
 
-            // 1. Try Van Queue (Rescue Van)
+            // 1. If using Van Queue system (Driving Vans)
             if (_vanQueue != null)
             {
                 VanController currentVan = _vanQueue.GetCurrentVan();
                 if (currentVan != null && !currentVan.IsFull && !currentVan.IsDrivingAway && currentVan.IsParked)
                 {
                     _tailManager.DeliverToVan(currentVan);
-                    return;
                 }
+                return; // NEVER fall through to stationary crate when using driving vans!
             }
 
-            // 2. Fallback to attached Delivery Crate
+            // 2. Fallback to attached Delivery Crate (Static crates mode)
             if (_attachedCrate != null && !_attachedCrate.IsFull)
             {
                 _tailManager.DeliverToCrate(_attachedCrate);
