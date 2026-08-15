@@ -21,8 +21,11 @@ namespace StraySwarm.Core
         [SerializeField] private int _gridHeight = 7;
         [SerializeField] private float _nodeSpacing = 1.5f;
 
+        public static GridManager Instance { get; private set; }
+
         private void Awake()
         {
+            if (Instance == null) Instance = this;
             RebuildGrid();
         }
 
