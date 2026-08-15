@@ -24,16 +24,7 @@ namespace StraySwarm.Gameplay
         [ContextMenu("Snap to Tile Center")]
         public void SnapToTileCenter()
         {
-            var tilemap = GetComponentInParent<UnityEngine.Tilemaps.Tilemap>() ?? Object.FindAnyObjectByType<UnityEngine.Tilemaps.Tilemap>();
-            if (tilemap != null)
-            {
-                Vector3Int cell = tilemap.WorldToCell(transform.position);
-                Vector3 target = tilemap.GetCellCenterWorld(cell);
-                if ((transform.position - target).sqrMagnitude > 0.0001f)
-                {
-                    transform.position = new Vector3(target.x, target.y, transform.position.z);
-                }
-            }
+            StraySwarm.Utils.PathSnapUtil.SnapTransform(transform, this);
         }
 
         private void Start()

@@ -30,22 +30,7 @@ namespace StraySwarm.Editor
             // Helper lambda to get path center
             Vector3 GetPathCenter(Vector3 worldPos)
             {
-                if (tilemap != null)
-                {
-                    Vector3Int cell = tilemap.WorldToCell(worldPos);
-                    return tilemap.GetCellCenterWorld(cell);
-                }
-                else if (grid != null)
-                {
-                    Vector3Int cell = grid.WorldToCell(worldPos);
-                    return grid.GetCellCenterWorld(cell);
-                }
-                else
-                {
-                    float cx = Mathf.Round(worldPos.x);
-                    float cy = Mathf.Round(worldPos.y);
-                    return new Vector3(cx, cy, worldPos.z);
-                }
+                return StraySwarm.Utils.PathSnapUtil.GetTileVisualCenter(worldPos);
             }
 
             // 1. Snap SpawnPoints

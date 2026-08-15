@@ -7,8 +7,8 @@ using StraySwarm.Utils;
 namespace StraySwarm.Editor
 {
     /// <summary>
-    /// Smoothly snaps level objects (SpawnPoints, Walls, Arrows, Stations) to exact path tile centers
-    /// the moment the mouse is released after dragging, eliminating any collider ghosting or gizmo fighting.
+    /// Snaps level objects (SpawnPoints, Walls, Arrows, Stations) to the exact visual center
+    /// of the nearest path tile the moment the mouse is released after dragging.
     /// </summary>
     [InitializeOnLoad]
     public static class SnapOnDropEditor
@@ -32,44 +32,16 @@ namespace StraySwarm.Editor
                 {
                     if (go == null) continue;
 
-                    var sp = go.GetComponent<AnimalSpawnPoint>();
-                    if (sp != null)
-                    {
-                        Undo.RecordObject(go.transform, "Snap SpawnPoint to Tile Center");
-                        sp.SnapToTileCenter();
-                        continue;
-                    }
+                    bool shouldSnap = go.GetComponent<AnimalSpawnPoint>() != null ||
+                                      go.GetComponent<NumberedWall>() != null ||
+                                      go.GetComponent<OneWayArrow>() != null ||
+                                      go.GetComponent<RescueStation>() != null ||
+                                      go.GetComponent<GridSnap>() != null;
 
-                    var wall = go.GetComponent<NumberedWall>();
-                    if (wall != null)
+                    if (shouldSnap)
                     {
-                        Undo.RecordObject(go.transform, "Snap NumberedWall to Tile Center");
-                        wall.SnapToTileCenter();
-                        continue;
-                    }
-
-                    var arrow = go.GetComponent<OneWayArrow>();
-                    if (arrow != null)
-                    {
-                        Undo.RecordObject(go.transform, "Snap OneWayArrow to Tile Center");
-                        arrow.SnapToTileCenter();
-                        continue;
-                    }
-
-                    var station = go.GetComponent<RescueStation>();
-                    if (station != null)
-                    {
-                        Undo.RecordObject(go.transform, "Snap RescueStation to Tile Center");
-                        station.SnapToTileCenter();
-                        continue;
-                    }
-
-                    var gridSnap = go.GetComponent<GridSnap>();
-                    if (gridSnap != null)
-                    {
-                        Undo.RecordObject(go.transform, "Snap to Path Center");
-                        gridSnap.SnapToPathCenter();
-                        continue;
+                        Undo.RecordObject(go.transform, "Snap to Path Tile Center");
+                        PathSnapUtil.SnapTransform(go.transform, go.transform);
                     }
                 }
             }
