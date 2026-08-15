@@ -1,17 +1,30 @@
 using UnityEngine;
-using TMPro; // Unity's built-in beautiful text system
+using UnityEngine.UI;
+using TMPro;
+using StraySwarm.Core;
+using StraySwarm.Gameplay;
 
 namespace StraySwarm.UI
 {
     /// <summary>
     /// Connects our Game logic to what the player sees on screen (the HUD).
+    /// Displays Timer, Level Title, Rescued Quota, and Current Van Demand HUD indicators.
     /// </summary>
     public class UIManager : MonoBehaviour
     {
+        public static UIManager Instance { get; private set; }
+
         [Header("HUD Elements")]
         [SerializeField] private TextMeshProUGUI _timerText;
+        [SerializeField] private TextMeshProUGUI _levelTitleText;
+        [SerializeField] private TextMeshProUGUI _quotaText;
+        [SerializeField] private TextMeshProUGUI _vanStatusText;
+        [SerializeField] private TextMeshProUGUI _coinText;
+
+        [Header("Panels")]
         [SerializeField] private GameObject _winPanel;
         [SerializeField] private GameObject _losePanel;
+        [SerializeField] private GameObject _pausePanel;
 
         [Header("Stars UI")]
         [Tooltip("The 3 star GameObjects on the Win Panel")]
@@ -22,29 +35,48 @@ namespace StraySwarm.UI
         [SerializeField] private Color _warningTimerColor = Color.red;
 
         [Header("Dependencies")]
-        [SerializeField] private Core.GameManager _gameManager;
+        [SerializeField] private GameManager _gameManager;
+
+        private bool _isPaused = false;
+
+        private void Awake()
+        {
+            if (Instance == null) Instance = this;
+        }
 
         private void Start()
         {
-            if (_gameManager == null) _gameManager = FindAnyObjectByType<Core.GameManager>();
+            if (_gameManager == null) _gameManager = FindAnyObjectByType<GameManager>();
             
-            // Hide panels at the start of the game
+            // Hide panels at start of the game
             if (_winPanel != null) _winPanel.SetActive(false);
             if (_losePanel != null) _losePanel.SetActive(false);
+            if (_pausePanel != null) _pausePanel.SetActive(false);
+
+            UpdateLevelTitle();
+        }
+
+        private void UpdateLevelTitle()
+        {
+            if (_levelTitleText != null)
+            {
+                int currentLvl = LevelManager.Instance != null ? LevelManager.Instance.CurrentLevelIndex + 1 : 1;
+                int currentWorld = LevelManager.Instance != null ? LevelManager.Instance.CurrentWorldIndex + 1 : 1;
+                _levelTitleText.text = $"LEVEL {currentWorld}-{currentLvl}";
+            }
         }
 
         private void Update()
         {
             if (_gameManager == null) return;
 
-            // 1. Update the Timer UI (Format it nicely as MM:SS)
+            // 1. Update Timer HUD
             if (_timerText != null)
             {
                 int minutes = Mathf.FloorToInt(_gameManager.TimeRemaining / 60F);
                 int seconds = Mathf.FloorToInt(_gameManager.TimeRemaining - minutes * 60);
                 _timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
                 
-                // Add a little tension: turn the timer red when under 10 seconds!
                 if (_gameManager.TimeRemaining < 10f)
                 {
                     _timerText.color = _warningTimerColor;
@@ -55,14 +87,64 @@ namespace StraySwarm.UI
                 }
             }
 
-            // 2. Show the correct screen if the game ends
-            if (_gameManager.CurrentState == Core.GameState.Won && _winPanel != null && !_winPanel.activeSelf)
+            // 2. Update Rescued Quota HUD
+            if (_quotaText != null && WaveSpawner.Instance != null)
+            {
+                _quotaText.text = $"🐾 {WaveSpawner.Instance.TotalDelivered} / {WaveSpawner.Instance.TotalQuota}";
+            }
+
+            // 3. Update Current Van Target HUD Indicator
+            if (_vanStatusText != null)
+            {
+                VanQueue vq = FindAnyObjectByType<VanQueue>();
+                if (vq != null)
+                {
+                    VanController currentVan = vq.GetCurrentVan();
+                    if (currentVan != null && currentVan.IsParked && !currentVan.IsDrivingAway)
+                    {
+                        string speciesEmoji = GetSpeciesEmoji(currentVan.TargetAnimalType);
+                        _vanStatusText.text = $"🚐 Van: {speciesEmoji} {currentVan.TargetAnimalType}";
+                    }
+                    else if (currentVan != null && !currentVan.IsParked)
+                    {
+                        _vanStatusText.text = "🚐 Van Arriving...";
+                    }
+                    else
+                    {
+                        _vanStatusText.text = "🚐 Waiting for Van...";
+                    }
+                }
+            }
+
+            // 4. Update Coin Balance HUD
+            if (_coinText != null)
+            {
+                int coins = Utils.SaveManager.Instance != null ? Utils.SaveManager.Instance.GetCoins() : 0;
+                _coinText.text = $"🪙 {coins}";
+            }
+
+            // 5. Show Win/Lose screens when state changes
+            if (_gameManager.CurrentState == GameState.Won && _winPanel != null && !_winPanel.activeSelf)
             {
                 StartCoroutine(AnimateWinScreen());
             }
-            else if (_gameManager.CurrentState == Core.GameState.Lost && _losePanel != null && !_losePanel.activeSelf)
+            else if (_gameManager.CurrentState == GameState.Lost && _losePanel != null && !_losePanel.activeSelf)
             {
                 _losePanel.SetActive(true);
+            }
+        }
+
+        private string GetSpeciesEmoji(Data.AnimalType type)
+        {
+            switch (type)
+            {
+                case Data.AnimalType.Puppy:  return "🐶";
+                case Data.AnimalType.Kitten: return "🐱";
+                case Data.AnimalType.Frog:   return "🐸";
+                case Data.AnimalType.Mouse:  return "🐹";
+                case Data.AnimalType.Pigeon: return "🐦";
+                case Data.AnimalType.Bunny:  return "🐰";
+                default: return "🐾";
             }
         }
 
@@ -85,14 +167,14 @@ namespace StraySwarm.UI
                 elapsed += Time.deltaTime;
                 float t = elapsed / duration;
                 
-                // BackOut Easing Formula (overshoots up to 1.2x scale)
+                // BackOut Easing Formula
                 float overshootT = 1f + 2.70158f * Mathf.Pow(t - 1f, 3f) + 1.70158f * Mathf.Pow(t - 1f, 2f);
                 panelTransform.localScale = Vector3.one * Mathf.Clamp(overshootT, 0f, 1.3f);
                 yield return null;
             }
             panelTransform.localScale = Vector3.one;
 
-            // 2. Pop each star in one-by-one (POP! POP! POP!)
+            // 2. Pop each star in one-by-one
             for (int i = 0; i < _stars.Length; i++)
             {
                 if (_stars[i] != null)
@@ -102,13 +184,11 @@ namespace StraySwarm.UI
 
                     if (isEarned)
                     {
-                        // Play an ascending musical chime for each star!
                         if (Audio.AudioManager.Instance != null)
                         {
                             Audio.AudioManager.Instance.PlayStar(i);
                         }
                         
-                        // Bounce scale animation for individual star
                         Transform starT = _stars[i].transform;
                         starT.localScale = Vector3.zero;
                         
@@ -123,36 +203,58 @@ namespace StraySwarm.UI
                         }
                         starT.localScale = Vector3.one;
                         
-                        yield return new WaitForSeconds(0.15f); // Short pause before popping next star!
+                        yield return new WaitForSeconds(0.15f);
                     }
                 }
             }
         }
 
         // --- BUTTON CLICK HANDLERS ---
+        public void TogglePause()
+        {
+            _isPaused = !_isPaused;
+            Time.timeScale = _isPaused ? 0f : 1f;
+            if (_pausePanel != null) _pausePanel.SetActive(_isPaused);
+        }
+
+        public void OnResumeButtonClicked()
+        {
+            _isPaused = false;
+            Time.timeScale = 1f;
+            if (_pausePanel != null) _pausePanel.SetActive(false);
+        }
+
         public void OnNextLevelButtonClicked()
         {
-            if (Core.LevelManager.Instance != null)
+            Time.timeScale = 1f;
+            if (LevelManager.Instance != null)
             {
-                Core.LevelManager.Instance.LoadNextLevel();
+                LevelManager.Instance.LoadNextLevel();
             }
             else
             {
-                // Fallback: reload scene
                 UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
             }
         }
 
         public void OnRestartButtonClicked()
         {
-            if (Core.LevelManager.Instance != null)
+            Time.timeScale = 1f;
+            if (LevelManager.Instance != null)
             {
-                Core.LevelManager.Instance.RestartCurrentLevel();
+                LevelManager.Instance.RestartCurrentLevel();
             }
             else
             {
-                // Fallback: reload scene
                 UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex);
+            }
+        }
+
+        public void OnMuteToggleClicked()
+        {
+            if (Audio.AudioManager.Instance != null)
+            {
+                Audio.AudioManager.Instance.ToggleMute();
             }
         }
     }

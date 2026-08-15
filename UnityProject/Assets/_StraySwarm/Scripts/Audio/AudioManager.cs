@@ -184,5 +184,15 @@ namespace StraySwarm.Audio
             AudioSource current = _isSourceAActive ? _musicSourceA : _musicSourceB;
             if (current != null) current.volume = MasterVolume * MusicVolume;
         }
+
+        private bool _isMuted = false;
+        public bool IsMuted => _isMuted;
+
+        public void ToggleMute()
+        {
+            _isMuted = !_isMuted;
+            MasterVolume = _isMuted ? 0f : 1f;
+            AudioListener.volume = MasterVolume;
+        }
     }
 }

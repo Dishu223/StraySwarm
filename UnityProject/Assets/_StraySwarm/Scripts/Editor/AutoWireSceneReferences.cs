@@ -132,13 +132,33 @@ namespace StraySwarm.Editor
                 SerializedObject so = new SerializedObject(ui);
                 Transform canvasT = ui.transform.root;
 
-                TextMeshProUGUI timerText = canvasT.GetComponentInChildren<TextMeshProUGUI>(true);
+                Transform timerObj = FindDeepChild(canvasT, "TimerText");
+                if (timerObj != null) so.FindProperty("_timerText").objectReferenceValue = timerObj.GetComponent<TextMeshProUGUI>();
+                else
+                {
+                    TextMeshProUGUI timerText = canvasT.GetComponentInChildren<TextMeshProUGUI>(true);
+                    if (timerText != null) so.FindProperty("_timerText").objectReferenceValue = timerText;
+                }
+
+                Transform titleObj = FindDeepChild(canvasT, "LevelTitleText");
+                if (titleObj != null) so.FindProperty("_levelTitleText").objectReferenceValue = titleObj.GetComponent<TextMeshProUGUI>();
+
+                Transform quotaObj = FindDeepChild(canvasT, "QuotaText");
+                if (quotaObj != null) so.FindProperty("_quotaText").objectReferenceValue = quotaObj.GetComponent<TextMeshProUGUI>();
+
+                Transform vanStatusObj = FindDeepChild(canvasT, "VanStatusText");
+                if (vanStatusObj != null) so.FindProperty("_vanStatusText").objectReferenceValue = vanStatusObj.GetComponent<TextMeshProUGUI>();
+
+                Transform coinObj = FindDeepChild(canvasT, "CoinText");
+                if (coinObj != null) so.FindProperty("_coinText").objectReferenceValue = coinObj.GetComponent<TextMeshProUGUI>();
+
                 Transform winPanel = FindDeepChild(canvasT, "WinPanel");
                 Transform losePanel = FindDeepChild(canvasT, "LosePanel");
+                Transform pausePanel = FindDeepChild(canvasT, "PausePanel");
 
-                if (timerText != null) so.FindProperty("_timerText").objectReferenceValue = timerText;
                 if (winPanel != null) so.FindProperty("_winPanel").objectReferenceValue = winPanel.gameObject;
                 if (losePanel != null) so.FindProperty("_losePanel").objectReferenceValue = losePanel.gameObject;
+                if (pausePanel != null) so.FindProperty("_pausePanel").objectReferenceValue = pausePanel.gameObject;
 
                 // Wire Stars
                 if (winPanel != null)
