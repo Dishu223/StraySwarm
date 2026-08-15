@@ -176,6 +176,12 @@ namespace StraySwarm.Gameplay
             if (isMatch)
             {
                 _currentLoad++;
+
+                // Notify WaveSpawner so delivery count and HUD update immediately!
+                if (WaveSpawner.Instance != null)
+                {
+                    WaveSpawner.Instance.OnAnimalDelivered(animal);
+                }
                 
                 // Play sound & particles!
                 if (JuiceManager.Instance != null)

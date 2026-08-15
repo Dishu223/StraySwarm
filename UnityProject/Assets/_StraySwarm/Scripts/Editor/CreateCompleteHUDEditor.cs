@@ -9,8 +9,8 @@ using StraySwarm.Core;
 namespace StraySwarm.Editor
 {
     /// <summary>
-    /// Master tool to automatically generate and wire all visual HUD elements onto the Scene Canvas.
-    /// Preserves existing PauseButton / PausePanel components while scaffolding Level Title, Timer, Coins, and Quota.
+    /// Master tool to generate and wire all visual HUD elements onto the Scene Canvas.
+    /// Preserves user's existing TimerText, PauseButton, and PausePanel without creating duplicates.
     /// Menu: Stray Swarm -> 🎨 Setup Complete Visual HUD (Canvas)
     /// </summary>
     public static class CreateCompleteHUDEditor
@@ -50,7 +50,7 @@ namespace StraySwarm.Editor
             topBarRect.anchorMax = new Vector2(1, 1);
             topBarRect.pivot = new Vector2(0.5f, 1);
             topBarRect.anchoredPosition = new Vector2(0, -20);
-            topBarRect.sizeDelta = new Vector2(0, 100);
+            topBarRect.sizeDelta = new Vector2(0, 80);
 
             // A. Level Title Text (Top Left)
             Transform titleObj = FindOrCreateUIChild(topBar, "LevelTitleText");
@@ -62,18 +62,7 @@ namespace StraySwarm.Editor
             titleRect.anchoredPosition = new Vector2(40, 0);
             titleRect.sizeDelta = new Vector2(260, 60);
 
-            // B. Timer Text (Top Center)
-            Transform timerObj = FindOrCreateUIChild(topBar, "TimerText");
-            TextMeshProUGUI timerText = EnsureTMP(timerObj, "01:00", 48, FontStyles.Bold, TextAlignmentOptions.Center);
-            timerText.color = new Color(0.6f, 0.2f, 0.07f);
-            RectTransform timerRect = timerObj.GetComponent<RectTransform>();
-            timerRect.anchorMin = new Vector2(0.5f, 0.5f);
-            timerRect.anchorMax = new Vector2(0.5f, 0.5f);
-            timerRect.pivot = new Vector2(0.5f, 0.5f);
-            timerRect.anchoredPosition = new Vector2(0, 0);
-            timerRect.sizeDelta = new Vector2(220, 70);
-
-            // C. Coin Text (Top Right)
+            // B. Coin Text (Top Right)
             Transform coinObj = FindOrCreateUIChild(topBar, "CoinText");
             TextMeshProUGUI coinText = EnsureTMP(coinObj, "🪙 0", 36, FontStyles.Bold, TextAlignmentOptions.Right);
             coinText.color = new Color(0.95f, 0.75f, 0.1f);
@@ -90,10 +79,10 @@ namespace StraySwarm.Editor
             subRect.anchorMin = new Vector2(0, 1);
             subRect.anchorMax = new Vector2(1, 1);
             subRect.pivot = new Vector2(0.5f, 1);
-            subRect.anchoredPosition = new Vector2(0, -120);
-            subRect.sizeDelta = new Vector2(0, 70);
+            subRect.anchoredPosition = new Vector2(0, -100);
+            subRect.sizeDelta = new Vector2(0, 60);
 
-            // A. Quota Text (Left Sub-Bar)
+            // Quota Text (Left Sub-Bar)
             Transform quotaObj = FindOrCreateUIChild(statusSubBar, "QuotaText");
             TextMeshProUGUI quotaText = EnsureTMP(quotaObj, "🐾 0 / 10", 34, FontStyles.Bold, TextAlignmentOptions.Left);
             quotaText.color = new Color(0.2f, 0.6f, 0.2f);
@@ -104,12 +93,12 @@ namespace StraySwarm.Editor
             quotaRect.anchoredPosition = new Vector2(40, 0);
             quotaRect.sizeDelta = new Vector2(320, 50);
 
-            // 5. Clean up any accidental duplicate PauseButton inside TopHUDBar
-            Transform duplicatePauseBtn = topBar.Find("PauseButton");
-            if (duplicatePauseBtn != null)
-            {
-                Object.DestroyImmediate(duplicatePauseBtn.gameObject);
-            }
+            // 5. Clean up any accidental duplicate TimerText or PauseButton inside TopHUDBar
+            Transform dupTimer = topBar.Find("TimerText");
+            if (dupTimer != null) Object.DestroyImmediate(dupTimer.gameObject);
+
+            Transform dupPause = topBar.Find("PauseButton");
+            if (dupPause != null) Object.DestroyImmediate(dupPause.gameObject);
 
             // 6. Auto-Wire Scene References
             AutoWireSceneReferences.AutoWireAll();
@@ -118,7 +107,7 @@ namespace StraySwarm.Editor
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene());
 
             Debug.Log("🎉 [CreateCompleteHUDEditor] Visual HUD setup complete!");
-            EditorUtility.DisplayDialog("Stray Swarm HUD", "Successfully synced all HUD elements:\n\n• Level Title (Top Left)\n• Timer (Top Center)\n• Coin Counter (Top Right)\n• Quota Progress Counter (Sub-Bar)\n\nYour existing Pause Button & Pause Menu have been preserved intact!", "Awesome!");
+            EditorUtility.DisplayDialog("Stray Swarm HUD", "Successfully synced all HUD elements:\n\n• Level Title (Top Left)\n• Coin Counter (Top Right)\n• Quota Progress Counter (Sub-Bar)\n\nYour existing Timer and Pause Button have been kept clean and untouched!", "Awesome!");
         }
 
         private static Transform FindOrCreateUIChild(Transform parent, string name)
