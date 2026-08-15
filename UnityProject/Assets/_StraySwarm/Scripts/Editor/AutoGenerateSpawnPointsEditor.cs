@@ -147,7 +147,7 @@ namespace StraySwarm.Editor
             List<GameObject> createdObjs = new List<GameObject>();
             foreach (var cell in selectedCells)
             {
-                Vector3 centerPos = tilemap.CellToWorld(cell) + tilemap.tileAnchor;
+                Vector3 centerPos = new Vector3(cell.x + 0.5f, cell.y + 0.5f, 0f);
                 Vector3 localPos = container.InverseTransformPoint(centerPos);
 
                 GameObject spGo;
