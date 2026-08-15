@@ -6,7 +6,7 @@ namespace StraySwarm.Gameplay
 {
     /// <summary>
     /// Represents the rescue van that accepts a specific animal species (Puppy, Kitten, etc.).
-    /// Features dynamic theme coloring and a high-contrast floating species icon cue.
+    /// Features a floating white cloud thought bubble displaying the target animal's face.
     /// </summary>
     public class VanController : MonoBehaviour
     {
@@ -16,6 +16,7 @@ namespace StraySwarm.Gameplay
 
         [Header("Visual Feedback")]
         [SerializeField] private SpriteRenderer _bodyRenderer;
+        [SerializeField] private Transform _cloudBubble;
         [SerializeField] private SpriteRenderer _targetAnimalIcon;
         
         public bool IsFull => _currentLoad >= Capacity;
@@ -28,27 +29,57 @@ namespace StraySwarm.Gameplay
         {
             if (_bodyRenderer == null) _bodyRenderer = GetComponent<SpriteRenderer>();
             if (_bodyRenderer != null) _bodyRenderer.sortingOrder = 8;
-            EnsureIconBadge();
+            EnsureCloudBubble();
         }
 
-        private void EnsureIconBadge()
+        private void EnsureCloudBubble()
         {
-            if (_targetAnimalIcon == null)
+            if (_cloudBubble == null)
             {
-                Transform existingBadge = transform.Find("AnimalIconBadge");
-                if (existingBadge != null)
+                Transform existingCloud = transform.Find("CloudThoughtBubble");
+                if (existingCloud != null)
                 {
-                    _targetAnimalIcon = existingBadge.GetComponent<SpriteRenderer>();
+                    _cloudBubble = existingCloud;
+                    Transform iconChild = _cloudBubble.Find("AnimalFaceIcon");
+                    if (iconChild != null) _targetAnimalIcon = iconChild.GetComponent<SpriteRenderer>();
                 }
                 else
                 {
-                    GameObject badgeObj = new GameObject("AnimalIconBadge");
-                    badgeObj.transform.SetParent(transform, false);
-                    badgeObj.transform.localPosition = new Vector3(0f, 0.95f, 0f);
-                    badgeObj.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
+                    // 1. Root Cloud Bubble
+                    GameObject cloudObj = new GameObject("CloudThoughtBubble");
+                    cloudObj.transform.SetParent(transform, false);
+                    cloudObj.transform.localPosition = new Vector3(0f, 1.15f, 0f);
+                    cloudObj.transform.localScale = Vector3.one;
+                    _cloudBubble = cloudObj.transform;
 
-                    _targetAnimalIcon = badgeObj.AddComponent<SpriteRenderer>();
-                    _targetAnimalIcon.sortingOrder = 14;
+                    // 2. White Cloud Background Pill
+                    SpriteRenderer cloudBg = cloudObj.AddComponent<SpriteRenderer>();
+                    cloudBg.color = Color.white;
+                    cloudBg.sortingOrder = 13;
+
+#if UNITY_EDITOR
+                    Sprite whiteBubble = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Placeholders/RoundedCube.png");
+                    if (whiteBubble == null) whiteBubble = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+                    if (whiteBubble != null) cloudBg.sprite = whiteBubble;
+#endif
+
+                    // 3. Small Tail Dot connecting cloud to van
+                    GameObject dotObj = new GameObject("CloudTailDot");
+                    dotObj.transform.SetParent(cloudObj.transform, false);
+                    dotObj.transform.localPosition = new Vector3(0f, -0.45f, 0f);
+                    dotObj.transform.localScale = new Vector3(0.25f, 0.25f, 1f);
+                    SpriteRenderer dotSr = dotObj.AddComponent<SpriteRenderer>();
+                    dotSr.color = Color.white;
+                    dotSr.sortingOrder = 13;
+                    if (cloudBg.sprite != null) dotSr.sprite = cloudBg.sprite;
+
+                    // 4. Animal Face Icon inside the Cloud
+                    GameObject iconObj = new GameObject("AnimalFaceIcon");
+                    iconObj.transform.SetParent(cloudObj.transform, false);
+                    iconObj.transform.localPosition = new Vector3(0f, 0.02f, 0f);
+                    iconObj.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
+                    _targetAnimalIcon = iconObj.AddComponent<SpriteRenderer>();
+                    _targetAnimalIcon.sortingOrder = 16;
                 }
             }
         }
@@ -66,7 +97,7 @@ namespace StraySwarm.Gameplay
 
         private void ApplySpeciesTheme(AnimalType type, Sprite customIcon = null)
         {
-            EnsureIconBadge();
+            EnsureCloudBubble();
 
             // 1. Set Body Color matching Kawaii species theme
             Color themeColor;
@@ -116,22 +147,22 @@ namespace StraySwarm.Gameplay
             {
                 if (iconSprite != null) _targetAnimalIcon.sprite = iconSprite;
                 _targetAnimalIcon.color = Color.white;
-                _targetAnimalIcon.sortingOrder = 14;
-                StopAllCoroutines();
-                StartCoroutine(BadgeBobRoutine());
+                _targetAnimalIcon.sortingOrder = 16;
             }
+
+            StopAllCoroutines();
+            StartCoroutine(CloudBobRoutine());
         }
 
-        private IEnumerator BadgeBobRoutine()
+        private IEnumerator CloudBobRoutine()
         {
-            if (_targetAnimalIcon == null) yield break;
-            Transform badgeTransform = _targetAnimalIcon.transform;
-            Vector3 baseLocalPos = new Vector3(0f, 0.95f, 0f);
+            if (_cloudBubble == null) yield break;
+            Vector3 baseLocalPos = new Vector3(0f, 1.15f, 0f);
 
             while (true)
             {
-                float bob = Mathf.Sin(Time.time * 4f) * 0.08f;
-                badgeTransform.localPosition = baseLocalPos + new Vector3(0f, bob, 0f);
+                float bob = Mathf.Sin(Time.time * 3.5f) * 0.08f;
+                _cloudBubble.localPosition = baseLocalPos + new Vector3(0f, bob, 0f);
                 yield return null;
             }
         }
@@ -160,7 +191,7 @@ namespace StraySwarm.Gameplay
                 // Make the animal visually zip into the van!
                 animal.FlyToVan(this.transform);
                 
-                // Trigger a micro camera shake for subtle tactile impact!
+                // Trigger camera shake
                 if (CameraShake.Instance != null)
                 {
                     CameraShake.Instance.Shake(0.1f, 0.05f);

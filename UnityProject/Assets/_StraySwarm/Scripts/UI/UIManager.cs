@@ -8,7 +8,8 @@ namespace StraySwarm.UI
 {
     /// <summary>
     /// Connects our Game logic to what the player sees on screen (the HUD).
-    /// Displays Timer, Level Title, Rescued Quota, and Current Van Demand HUD indicators.
+    /// Displays Timer, Level Title, Rescued Quota, and Coin balance.
+    /// Animal requirements are displayed cleanly via floating cloud speech bubbles over the Rescue Vans.
     /// </summary>
     public class UIManager : MonoBehaviour
     {
@@ -18,7 +19,6 @@ namespace StraySwarm.UI
         [SerializeField] private TextMeshProUGUI _timerText;
         [SerializeField] private TextMeshProUGUI _levelTitleText;
         [SerializeField] private TextMeshProUGUI _quotaText;
-        [SerializeField] private TextMeshProUGUI _vanStatusText;
         [SerializeField] private TextMeshProUGUI _coinText;
 
         [Header("Panels")]
@@ -56,7 +56,7 @@ namespace StraySwarm.UI
             UpdateLevelTitle();
         }
 
-        private void UpdateLevelTitle()
+        public void UpdateLevelTitle()
         {
             if (_levelTitleText != null)
             {
@@ -93,37 +93,14 @@ namespace StraySwarm.UI
                 _quotaText.text = $"🐾 {WaveSpawner.Instance.TotalDelivered} / {WaveSpawner.Instance.TotalQuota}";
             }
 
-            // 3. Update Current Van Target HUD Indicator
-            if (_vanStatusText != null)
-            {
-                VanQueue vq = FindAnyObjectByType<VanQueue>();
-                if (vq != null)
-                {
-                    VanController currentVan = vq.GetCurrentVan();
-                    if (currentVan != null && currentVan.IsParked && !currentVan.IsDrivingAway)
-                    {
-                        string speciesEmoji = GetSpeciesEmoji(currentVan.TargetAnimalType);
-                        _vanStatusText.text = $"🚐 Van: {speciesEmoji} {currentVan.TargetAnimalType}";
-                    }
-                    else if (currentVan != null && !currentVan.IsParked)
-                    {
-                        _vanStatusText.text = "🚐 Van Arriving...";
-                    }
-                    else
-                    {
-                        _vanStatusText.text = "🚐 Waiting for Van...";
-                    }
-                }
-            }
-
-            // 4. Update Coin Balance HUD
+            // 3. Update Coin Balance HUD
             if (_coinText != null)
             {
                 int coins = Utils.SaveManager.Instance != null ? Utils.SaveManager.Instance.GetCoins() : 0;
                 _coinText.text = $"🪙 {coins}";
             }
 
-            // 5. Show Win/Lose screens when state changes
+            // 4. Show Win/Lose screens when state changes
             if (_gameManager.CurrentState == GameState.Won && _winPanel != null && !_winPanel.activeSelf)
             {
                 StartCoroutine(AnimateWinScreen());
@@ -131,20 +108,6 @@ namespace StraySwarm.UI
             else if (_gameManager.CurrentState == GameState.Lost && _losePanel != null && !_losePanel.activeSelf)
             {
                 _losePanel.SetActive(true);
-            }
-        }
-
-        private string GetSpeciesEmoji(Data.AnimalType type)
-        {
-            switch (type)
-            {
-                case Data.AnimalType.Puppy:  return "🐶";
-                case Data.AnimalType.Kitten: return "🐱";
-                case Data.AnimalType.Frog:   return "🐸";
-                case Data.AnimalType.Mouse:  return "🐹";
-                case Data.AnimalType.Pigeon: return "🐦";
-                case Data.AnimalType.Bunny:  return "🐰";
-                default: return "🐾";
             }
         }
 
