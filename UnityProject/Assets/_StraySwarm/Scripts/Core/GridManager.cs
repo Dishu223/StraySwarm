@@ -23,13 +23,23 @@ namespace StraySwarm.Core
 
         private void Awake()
         {
+            RebuildGrid();
+        }
+
+        public void RebuildGrid()
+        {
+            if (_floorTilemap == null)
+            {
+                _floorTilemap = FindAnyObjectByType<Tilemap>();
+            }
+
             if (_floorTilemap != null)
             {
                 GenerateGridFromTilemap();
             }
             else
             {
-                Debug.LogWarning("[GridManager] No Floor Tilemap assigned! Generating fallback square grid.");
+                Debug.LogWarning("[GridManager] No Floor Tilemap found in scene! Generating fallback square grid.");
                 GenerateTestGrid();
             }
         }

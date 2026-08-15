@@ -22,6 +22,8 @@ namespace StraySwarm.Core
         public int CurrentLevelIndex { get; private set; } = 0;
         public List<WorldData> Worlds => _worlds;
 
+        private GameObject _spawnedMapInstance;
+
         private void Awake()
         {
             if (Instance == null)
@@ -29,11 +31,41 @@ namespace StraySwarm.Core
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
                 RebuildFlatPlaylist();
+                SpawnActiveLevelMap();
             }
             else
             {
                 Destroy(gameObject);
             }
+        }
+
+        public void SpawnActiveLevelMap()
+        {
+            LevelData data = GetCurrentLevelData();
+            if (data == null || data.MapPrefab == null) return;
+
+            // 1. Clean up old spawned map or loose prototype scene grid
+            if (_spawnedMapInstance != null)
+            {
+                Destroy(_spawnedMapInstance);
+            }
+            else
+            {
+                // Remove prototype root objects if present
+                var oldRoots = new string[] { "Grid", "AnimalSpawnPoints", "Stations", "Obstacles", "RescueStation", "NumberedWall_3", "OneWayArrow_Down" };
+                foreach (var rName in oldRoots)
+                {
+                    GameObject obj = GameObject.Find(rName);
+                    if (obj != null && obj.transform.parent == null)
+                    {
+                        Destroy(obj);
+                    }
+                }
+            }
+
+            // 2. Instantiate new level map prefab
+            _spawnedMapInstance = Instantiate(data.MapPrefab);
+            _spawnedMapInstance.name = data.MapPrefab.name;
         }
 
         public void RebuildFlatPlaylist()
@@ -107,5 +139,21 @@ namespace StraySwarm.Core
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("🕹️ Play Level 1")]
+        public void EditorSelectLevel1()
+        {
+            SelectLevel(0);
+            Debug.Log($"🎮 [LevelManager] Selected Level 1 ({GetCurrentLevelData()?.LevelName})");
+        }
+
+        [ContextMenu("🕹️ Play Level 2")]
+        public void EditorSelectLevel2()
+        {
+            SelectLevel(1);
+            Debug.Log($"🎮 [LevelManager] Selected Level 2 ({GetCurrentLevelData()?.LevelName})");
+        }
+#endif
     }
 }
