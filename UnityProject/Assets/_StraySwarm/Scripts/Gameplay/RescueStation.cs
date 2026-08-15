@@ -6,6 +6,7 @@ namespace StraySwarm.Gameplay
     /// The delivery zone where the player drops off collected animals.
     /// Supports both stationary DeliveryCrates (multi-station) and legacy VanQueue.
     /// </summary>
+    [ExecuteAlways]
     public class RescueStation : MonoBehaviour
     {
         [Header("Van Parking Spot")]
@@ -21,8 +22,33 @@ namespace StraySwarm.Gameplay
         [Header("Dependencies")]
         [SerializeField] private TailManager _tailManager;
 
+        private void Update()
+        {
+            if (!Application.isPlaying && transform.hasChanged)
+            {
+                SnapToTileCenter();
+                transform.hasChanged = false;
+            }
+        }
+
+        [ContextMenu("Snap to Tile Center")]
+        public void SnapToTileCenter()
+        {
+            var tilemap = GetComponentInParent<UnityEngine.Tilemaps.Tilemap>() ?? Object.FindAnyObjectByType<UnityEngine.Tilemaps.Tilemap>();
+            if (tilemap != null)
+            {
+                Vector3Int cell = tilemap.WorldToCell(transform.position);
+                Vector3 target = tilemap.GetCellCenterWorld(cell);
+                if ((transform.position - target).sqrMagnitude > 0.0001f)
+                {
+                    transform.position = new Vector3(target.x, target.y, transform.position.z);
+                }
+            }
+        }
+
         private void Start()
         {
+            if (!Application.isPlaying) return;
             if (_tailManager == null) _tailManager = FindAnyObjectByType<TailManager>();
             if (_attachedCrate == null) _attachedCrate = GetComponent<DeliveryCrate>();
             if (_vanQueue == null) _vanQueue = FindAnyObjectByType<VanQueue>();

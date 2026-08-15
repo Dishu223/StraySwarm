@@ -9,6 +9,7 @@ namespace StraySwarm.Gameplay
     /// Breakable stone wall that counts down each time the player hits/passes it.
     /// Shatters and clears the path when its count reaches 0!
     /// </summary>
+    [ExecuteAlways]
     public class NumberedWall : MonoBehaviour
     {
         [Header("Wall Configuration")]
@@ -23,6 +24,30 @@ namespace StraySwarm.Gameplay
         [SerializeField] private ParticleSystem _crumbleParticles;
 
         public bool IsBroken => _hitPoints <= 0;
+
+        private void Update()
+        {
+            if (!Application.isPlaying && transform.hasChanged)
+            {
+                SnapToTileCenter();
+                transform.hasChanged = false;
+            }
+        }
+
+        [ContextMenu("Snap to Tile Center")]
+        public void SnapToTileCenter()
+        {
+            var tilemap = GetComponentInParent<UnityEngine.Tilemaps.Tilemap>() ?? Object.FindAnyObjectByType<UnityEngine.Tilemaps.Tilemap>();
+            if (tilemap != null)
+            {
+                Vector3Int cell = tilemap.WorldToCell(transform.position);
+                Vector3 target = tilemap.GetCellCenterWorld(cell);
+                if ((transform.position - target).sqrMagnitude > 0.0001f)
+                {
+                    transform.position = new Vector3(target.x, target.y, transform.position.z);
+                }
+            }
+        }
 
         private void Start()
         {
