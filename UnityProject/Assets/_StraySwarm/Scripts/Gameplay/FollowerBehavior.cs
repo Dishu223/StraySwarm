@@ -66,6 +66,10 @@ namespace StraySwarm.Gameplay
             if (IsCollected) return;
             IsCollected = true;
 
+            // Immediately disable collider to prevent any possible duplicate trigger
+            Collider2D col = GetComponent<Collider2D>();
+            if (col != null) col.enabled = false;
+
             // Enable basket bounce / sway when joining the tail
             if (_basketBounce != null)
             {

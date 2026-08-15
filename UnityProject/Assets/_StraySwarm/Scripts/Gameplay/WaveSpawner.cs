@@ -43,13 +43,20 @@ namespace StraySwarm.Gameplay
             else Destroy(gameObject);
         }
 
+        private bool _isInitializedThisLevel = false;
+
         private void Start()
         {
-            InitializeWaveSystem();
+            if (!_isInitializedThisLevel)
+            {
+                InitializeWaveSystem();
+            }
         }
 
         public void InitializeWaveSystem()
         {
+            _isInitializedThisLevel = true;
+
             // 1. Gather all scene spawn points and sort them strictly by Hierarchy Order
             _spawnPoints = FindObjectsByType<AnimalSpawnPoint>(FindObjectsInactive.Exclude)
                 .OrderBy(sp => sp.transform.GetSiblingIndex())
@@ -90,6 +97,7 @@ namespace StraySwarm.Gameplay
             {
                 if (!animal.IsCollected)
                 {
+                    animal.gameObject.SetActive(false);
                     Destroy(animal.gameObject);
                 }
             }
@@ -105,6 +113,13 @@ namespace StraySwarm.Gameplay
 
             // 4. Configure Initial Crates with matching on-map requirements
             ConfigureAllCrates();
+
+            // 5. Notify VanQueue to build matching schedule
+            VanQueue vq = FindAnyObjectByType<VanQueue>();
+            if (vq != null)
+            {
+                vq.InitializeVanSchedule();
+            }
 
             Debug.Log($"🎉 [WaveSpawner] Initialized with {_totalQuota} total quota ({_spawnPoints.Count} sorted spawn points, {_activeCrates.Count} crates).");
         }

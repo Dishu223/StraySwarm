@@ -98,7 +98,7 @@ namespace StraySwarm.Gameplay
         private void OnTriggerEnter2D(Collider2D other)
         {
             FollowerBehavior follower = other.GetComponent<FollowerBehavior>();
-            if (follower != null && !follower.IsCollected)
+            if (follower != null && !follower.IsCollected && !_tail.Contains(follower))
             {
                 AddFollower(follower);
             }
