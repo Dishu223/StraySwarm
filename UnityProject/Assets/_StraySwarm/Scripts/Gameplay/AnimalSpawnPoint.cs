@@ -15,19 +15,9 @@ namespace StraySwarm.Gameplay
         [ContextMenu("Snap to Tile Center")]
         public void SnapToTileCenter()
         {
-            Tilemap tilemap = GetComponentInParent<Tilemap>() ?? Object.FindAnyObjectByType<Tilemap>();
-            if (tilemap != null)
-            {
-                Vector3Int cell = tilemap.WorldToCell(transform.position);
-                Vector3 center = tilemap.GetCellCenterWorld(cell);
-                transform.position = new Vector3(center.x, center.y, 0f);
-            }
-            else
-            {
-                float cx = Mathf.Floor(transform.position.x) + 0.5f;
-                float cy = Mathf.Floor(transform.position.y) + 0.5f;
-                transform.position = new Vector3(cx, cy, 0f);
-            }
+            float cx = Mathf.Floor(transform.position.x) + 0.5f;
+            float cy = Mathf.Floor(transform.position.y) + 0.5f;
+            transform.position = new Vector3(cx, cy, 0f);
         }
 
         private void OnDrawGizmos()
