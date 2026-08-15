@@ -83,6 +83,20 @@ namespace StraySwarm.Utils
             }
         }
 
+        public int GetCoins()
+        {
+            return Data != null ? Data.TotalCoins : 0;
+        }
+
+        public void AddCoins(int amount)
+        {
+            if (Data != null)
+            {
+                Data.TotalCoins += amount;
+                SaveGame();
+            }
+        }
+
         public void SaveLevelStars(int levelIndex, int stars)
         {
             // Expand list if needed
