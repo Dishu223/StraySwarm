@@ -7,20 +7,10 @@ namespace StraySwarm.Gameplay
     /// Placed on tiles where animals can spawn.
     /// Snaps directly to the visual center of the Tilemap path in Edit Mode.
     /// </summary>
-    [ExecuteAlways]
     public class AnimalSpawnPoint : MonoBehaviour
     {
         public bool IsOccupied { get; set; } = false;
         public FollowerBehavior CurrentAnimal { get; set; } = null;
-
-        private void Update()
-        {
-            if (!Application.isPlaying && transform.hasChanged)
-            {
-                SnapToTileCenter();
-                transform.hasChanged = false;
-            }
-        }
 
         [ContextMenu("Snap to Tile Center")]
         public void SnapToTileCenter()

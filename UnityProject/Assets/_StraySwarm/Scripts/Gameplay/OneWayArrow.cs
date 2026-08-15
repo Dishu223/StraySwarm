@@ -15,7 +15,6 @@ namespace StraySwarm.Gameplay
     /// One-Way Arrow tile on the path.
     /// Forces the player in a specific direction and prevents reversing against the arrow!
     /// </summary>
-    [ExecuteAlways]
     [RequireComponent(typeof(Collider2D))]
     public class OneWayArrow : MonoBehaviour
     {
@@ -35,15 +34,6 @@ namespace StraySwarm.Gameplay
                     ArrowDirection.Left => Vector2Int.left,
                     _ => Vector2Int.right
                 };
-            }
-        }
-
-        private void Update()
-        {
-            if (!Application.isPlaying && transform.hasChanged)
-            {
-                SnapToTileCenter();
-                transform.hasChanged = false;
             }
         }
 
