@@ -67,17 +67,17 @@ namespace StraySwarm.Core
             // 1. Clean up old spawned map or loose prototype scene grid
             if (_spawnedMapInstance != null)
             {
-                Destroy(_spawnedMapInstance);
+                DestroyImmediate(_spawnedMapInstance);
             }
 
             // Remove any prototype root objects if present in scene
-            var oldRoots = new string[] { "Grid", "AnimalSpawnPoints", "Stations", "Obstacles", "RescueStation", "NumberedWall_3", "OneWayArrow_Down" };
+            var oldRoots = new string[] { "Grid", "AnimalSpawnPoints", "Stations", "Obstacles", "RescueStation", "NumberedWall_3", "OneWayArrow_Down", "Level_01_Map", "Level_02_Map" };
             foreach (var rName in oldRoots)
             {
                 GameObject obj = GameObject.Find(rName);
                 if (obj != null && obj.transform.parent == null)
                 {
-                    Destroy(obj);
+                    DestroyImmediate(obj);
                 }
             }
 

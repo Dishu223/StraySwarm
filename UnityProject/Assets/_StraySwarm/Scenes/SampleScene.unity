@@ -3069,7 +3069,6 @@ GameObject:
   - component: {fileID: 1463483351}
   - component: {fileID: 1463483353}
   - component: {fileID: 1463483354}
-  - component: {fileID: 1463483355}
   - component: {fileID: 1463483356}
   m_Layer: 0
   m_Name: GameManager
@@ -3139,33 +3138,6 @@ MonoBehaviour:
   _currentLevelIndex: 0
   _onLevelWonEvent: {fileID: 11400000, guid: 96142ac1618ca2f44aa4a8cf7a6c902b, type: 2}
   _onLevelLostEvent: {fileID: 11400000, guid: d624edf64f4c22a499c18bb712ebc1bd, type: 2}
---- !u!114 &1463483355
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1463483350}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32b046fd081abf64da190e9a196e70b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.LevelBuilder
-  _puppyPrefab: {fileID: 2332256580593744271, guid: dcdb897cf3120554ab578cdbd3770bc4, type: 3}
-  _kittenPrefab: {fileID: 7835628775702139793, guid: 6ec4e4b183f980045bbc846fe1cafc2c, type: 3}
-  _frogPrefab: {fileID: 917317840167997173, guid: 5ed58006586af05488bdb7f020d1e926, type: 3}
-  _mousePrefab: {fileID: 7386033165561416063, guid: 19eb269ab383d724da9dc547de8ba64f, type: 3}
-  _pigeonPrefab: {fileID: 5169264943650988400, guid: 0e7e70c48ddfa544592c59f1ab08556a, type: 3}
-  _bunnyPrefab: {fileID: 4090614948298647241, guid: 48b6c741d9fd2e94883c719139a2d81f, type: 3}
-  _arrowUpPrefab: {fileID: 277424056793205766, guid: 19a0fa59bf0706b49b64fa831cdeffaa, type: 3}
-  _arrowRightPrefab: {fileID: 5914963592621648612, guid: 85debd26ab470ce43a866afa0d017e03, type: 3}
-  _arrowDownPrefab: {fileID: 1337017835325022389, guid: 2dbbf50ea7a892d40b198ccd241dfde8, type: 3}
-  _arrowLeftPrefab: {fileID: 3071657628416909038, guid: 354454b59c42a294a97a88a7dac85748, type: 3}
-  _wall1Prefab: {fileID: 2417478026796456849, guid: 648a16480c0797a449e8c0893681e7d3, type: 3}
-  _wall2Prefab: {fileID: 8362377478832354901, guid: 1ca37f4b530e56242bbbf1767df37590, type: 3}
-  _wall3Prefab: {fileID: 8377117601131273058, guid: e1dc71e97fa438542b5f15fe4eb8f6a5, type: 3}
-  _spawnedContainer: {fileID: 0}
-  _playerTransform: {fileID: 0}
 --- !u!114 &1463483356
 MonoBehaviour:
   m_ObjectHideFlags: 0
