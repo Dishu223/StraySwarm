@@ -24,12 +24,34 @@ namespace StraySwarm.Utils
         [ContextMenu("Snap to Path Center")]
         public void SnapToPathCenter()
         {
-            float cx = Mathf.Floor(transform.position.x) + 0.5f;
-            float cy = Mathf.Floor(transform.position.y) + 0.5f;
-            Vector3 target = new Vector3(cx, cy, transform.position.z);
-            if ((transform.position - target).sqrMagnitude > 0.0001f)
+            Tilemap tilemap = GetComponentInParent<Tilemap>() ?? Object.FindAnyObjectByType<Tilemap>();
+            if (tilemap != null)
             {
-                transform.position = target;
+                Vector3Int cell = tilemap.WorldToCell(transform.position);
+                Vector3 target = tilemap.GetCellCenterWorld(cell);
+                if ((transform.position - target).sqrMagnitude > 0.0001f)
+                {
+                    transform.position = new Vector3(target.x, target.y, transform.position.z);
+                }
+            }
+            else
+            {
+                Grid grid = Object.FindAnyObjectByType<Grid>();
+                if (grid != null)
+                {
+                    Vector3Int cell = grid.WorldToCell(transform.position);
+                    Vector3 target = grid.GetCellCenterWorld(cell);
+                    if ((transform.position - target).sqrMagnitude > 0.0001f)
+                    {
+                        transform.position = new Vector3(target.x, target.y, transform.position.z);
+                    }
+                }
+                else
+                {
+                    float cx = Mathf.Round(transform.position.x);
+                    float cy = Mathf.Round(transform.position.y);
+                    transform.position = new Vector3(cx, cy, transform.position.z);
+                }
             }
         }
     }
