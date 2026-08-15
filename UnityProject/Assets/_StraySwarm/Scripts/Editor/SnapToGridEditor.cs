@@ -28,9 +28,9 @@ namespace StraySwarm.Editor
             int snappedCount = 0;
 
             // Helper lambda to get path center
-            Vector3 GetPathCenter(Vector3 worldPos)
+            Vector3 GetPathCenter(Vector3 worldPos, Component context)
             {
-                return StraySwarm.Utils.PathSnapUtil.GetTileVisualCenter(worldPos);
+                return StraySwarm.Utils.PathSnapUtil.GetTileVisualCenter(worldPos, context);
             }
 
             // 1. Snap SpawnPoints
@@ -38,7 +38,7 @@ namespace StraySwarm.Editor
             foreach (var sp in spawnPoints)
             {
                 Undo.RecordObject(sp.transform, "Snap to Path Center");
-                sp.transform.position = GetPathCenter(sp.transform.position);
+                sp.transform.position = GetPathCenter(sp.transform.position, sp);
                 snappedCount++;
             }
 
@@ -47,7 +47,7 @@ namespace StraySwarm.Editor
             foreach (var wall in walls)
             {
                 Undo.RecordObject(wall.transform, "Snap to Path Center");
-                wall.transform.position = GetPathCenter(wall.transform.position);
+                wall.transform.position = GetPathCenter(wall.transform.position, wall);
                 snappedCount++;
             }
 
@@ -55,7 +55,7 @@ namespace StraySwarm.Editor
             foreach (var arrow in arrows)
             {
                 Undo.RecordObject(arrow.transform, "Snap to Path Center");
-                arrow.transform.position = GetPathCenter(arrow.transform.position);
+                arrow.transform.position = GetPathCenter(arrow.transform.position, arrow);
                 snappedCount++;
             }
 
@@ -64,7 +64,7 @@ namespace StraySwarm.Editor
             foreach (var station in stations)
             {
                 Undo.RecordObject(station.transform, "Snap to Path Center");
-                station.transform.position = GetPathCenter(station.transform.position);
+                station.transform.position = GetPathCenter(station.transform.position, station);
                 snappedCount++;
             }
 
@@ -73,7 +73,7 @@ namespace StraySwarm.Editor
             if (player != null)
             {
                 Undo.RecordObject(player.transform, "Snap to Path Center");
-                player.transform.position = GetPathCenter(player.transform.position);
+                player.transform.position = GetPathCenter(player.transform.position, player.transform);
                 snappedCount++;
             }
 
