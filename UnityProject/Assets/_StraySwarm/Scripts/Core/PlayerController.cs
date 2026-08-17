@@ -165,6 +165,11 @@ namespace StraySwarm.Core
                 float stepDuration = 1f / Mathf.Max(_moveSpeed, 0.1f);
                 _cubeWobble.TriggerHop(stepDuration);
             }
+
+            if (Gameplay.JuiceManager.Instance != null)
+            {
+                Gameplay.JuiceManager.Instance.PlayWalkDust(transform.position);
+            }
         }
     }
 }

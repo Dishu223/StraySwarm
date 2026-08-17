@@ -260,6 +260,19 @@ namespace StraySwarm.Editor
                 ParticleSystem confetti = AssetDatabase.LoadAssetAtPath<ParticleSystem>("Assets/_StraySwarm/Prefabs/WinConfettiPrefab.prefab");
                 if (confetti == null) confetti = AssetDatabase.LoadAssetAtPath<ParticleSystem>("Assets/_StraySwarm/Prefabs/Juice/WinConfettiPrefab.prefab");
                 if (confetti != null) so.FindProperty("_winConfettiPrefab").objectReferenceValue = confetti;
+
+                ParticleSystem walkDust = AssetDatabase.LoadAssetAtPath<ParticleSystem>("Assets/_StraySwarm/Prefabs/Juice/WalkDustPrefab.prefab");
+                if (walkDust != null) so.FindProperty("_walkDustPrefab").objectReferenceValue = walkDust;
+
+                ParticleSystem collectPs = AssetDatabase.LoadAssetAtPath<ParticleSystem>("Assets/_StraySwarm/Prefabs/Juice/CollectSparklePrefab.prefab");
+                if (collectPs != null) so.FindProperty("_collectParticlePrefab").objectReferenceValue = collectPs;
+
+                ParticleSystem deliverPs = AssetDatabase.LoadAssetAtPath<ParticleSystem>("Assets/_StraySwarm/Prefabs/Juice/DeliverZipPrefab.prefab");
+                if (deliverPs != null) so.FindProperty("_deliverParticlePrefab").objectReferenceValue = deliverPs;
+
+                ParticleSystem vanSmoke = AssetDatabase.LoadAssetAtPath<ParticleSystem>("Assets/_StraySwarm/Prefabs/Juice/VanSmokePrefab.prefab");
+                if (vanSmoke != null) so.FindProperty("_vanSmokePrefab").objectReferenceValue = vanSmoke;
+
                 so.ApplyModifiedProperties();
                 wiredCount++;
             }
