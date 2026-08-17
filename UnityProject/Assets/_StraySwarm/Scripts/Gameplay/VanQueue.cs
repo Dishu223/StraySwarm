@@ -138,7 +138,7 @@ namespace StraySwarm.Gameplay
             VanDemand demand = _vanDemands[_currentVanIndex];
             _currentVanIndex++;
 
-            GameObject vanObj = Instantiate(_vanPrefab, spawnPos, Quaternion.identity);
+            GameObject vanObj = Instantiate(_vanPrefab, spawnPos, _vanPrefab != null ? _vanPrefab.transform.rotation : Quaternion.Euler(0f, 0f, -90f));
             vanObj.name = $"RescueVan_{demand.Type}";
             
             _activeVan = vanObj.GetComponent<VanController>();

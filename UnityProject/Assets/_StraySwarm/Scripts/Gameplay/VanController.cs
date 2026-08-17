@@ -14,6 +14,10 @@ namespace StraySwarm.Gameplay
         public AnimalType TargetAnimalType = AnimalType.Puppy;
         public int Capacity = 3;
 
+        [Header("Orientation Settings")]
+        [Tooltip("Z rotation angle in degrees (e.g. -90 to face right)")]
+        [SerializeField] private float _vanRotationZ = -90f;
+
         [Header("Visual Feedback")]
         [SerializeField] private SpriteRenderer _bodyRenderer;
         [SerializeField] private Transform _thoughtBubbleRoot;
@@ -27,6 +31,7 @@ namespace StraySwarm.Gameplay
 
         private void Awake()
         {
+            transform.rotation = Quaternion.Euler(0f, 0f, _vanRotationZ);
             if (_bodyRenderer == null) _bodyRenderer = GetComponent<SpriteRenderer>();
             if (_bodyRenderer != null) _bodyRenderer.sortingOrder = 8;
             EnsureThoughtBubble();
