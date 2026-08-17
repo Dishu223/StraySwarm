@@ -26,13 +26,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1271426512251005051}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.6, y: 1.1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!212 &2579961202862442233
 SpriteRenderer:
   serializedVersion: 3
@@ -82,12 +82,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 8
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: b7a1e2f3d4c5b6a7890123456789abcd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 99c354d7f82b4b24194f4b2b306f907d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 4, y: 4}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -105,5 +105,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e31834ee0e2a4e540b9535dd65aed73d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StraySwarm.Gameplay.VanController
-  RequiredColor: Blue
+  TargetAnimalType: 0
   Capacity: 3
+  _bodyRenderer: {fileID: 0}
+  _thoughtBubbleRoot: {fileID: 0}
+  _targetAnimalIcon: {fileID: 0}

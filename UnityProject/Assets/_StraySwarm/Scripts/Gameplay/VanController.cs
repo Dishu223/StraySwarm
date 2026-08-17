@@ -214,12 +214,13 @@ namespace StraySwarm.Gameplay
         private IEnumerator ThoughtBobRoutine()
         {
             if (_thoughtBubbleRoot == null) yield break;
-            Vector3 baseLocalPos = new Vector3(0.42f, 0.48f, 0f);
+            Vector3 baseLocalPos = new Vector3(0.48f, 0.42f, 0f);
 
             while (true)
             {
                 float bob = Mathf.Sin(Time.time * 3.5f) * 0.04f;
                 _thoughtBubbleRoot.localPosition = baseLocalPos + new Vector3(0f, bob, 0f);
+                _thoughtBubbleRoot.rotation = Quaternion.identity; // Keeps thought bubble & animal photo upright!
                 yield return null;
             }
         }
