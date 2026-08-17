@@ -103,7 +103,7 @@ namespace StraySwarm.Core
                 if (pos.y > maxY) maxY = pos.y;
             }
 
-            // Include any rescue stations on the map
+            // Include any rescue stations on the map (and van parking spots)
             var stations = Object.FindObjectsByType<Gameplay.RescueStation>(FindObjectsInactive.Exclude);
             foreach (var st in stations)
             {
@@ -112,19 +112,29 @@ namespace StraySwarm.Core
                 if (pos.x > maxX) maxX = pos.x;
                 if (pos.y < minY) minY = pos.y;
                 if (pos.y > maxY) maxY = pos.y;
+
+                if (st.VanParkingSpot != null)
+                {
+                    Vector3 vPos = st.VanParkingSpot.position;
+                    if (vPos.x < minX) minX = vPos.x;
+                    if (vPos.x > maxX) maxX = vPos.x;
+                    if (vPos.y < minY) minY = vPos.y;
+                    if (vPos.y > maxY) maxY = vPos.y;
+                }
             }
 
             float centerX = (minX + maxX) * 0.5f;
             float centerY = (minY + maxY) * 0.5f;
 
-            // Extra top padding for the Top HUD and Timer
-            float width = (maxX - minX) + 2.2f;
-            float height = (maxY - minY) + 3.8f;
+            // Extra top headroom for the Top HUD and Timer (+4.2 units height headroom)
+            float width = (maxX - minX) + 2.5f;
+            float height = (maxY - minY) + 4.2f;
 
-            cam.transform.position = new Vector3(centerX, centerY - 0.4f, -10f);
+            // Position camera slightly downward so the top HUD has ample breathing room
+            cam.transform.position = new Vector3(centerX, centerY - 0.6f, -10f);
 
             float targetOrtho = Mathf.Max(height * 0.5f, (width / cam.aspect) * 0.5f);
-            cam.orthographicSize = Mathf.Clamp(targetOrtho, 5.5f, 20f);
+            cam.orthographicSize = Mathf.Clamp(targetOrtho, 6.0f, 20f);
         }
 
         /// <summary>

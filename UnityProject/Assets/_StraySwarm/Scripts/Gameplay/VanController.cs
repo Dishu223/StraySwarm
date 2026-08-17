@@ -138,7 +138,21 @@ namespace StraySwarm.Gameplay
 
             if (_bodyRenderer != null)
             {
-                _bodyRenderer.color = themeColor;
+#if UNITY_EDITOR
+                if (_bodyRenderer.sprite == null || _bodyRenderer.sprite.name == "RoundedCube" || _bodyRenderer.sprite.name == "Knob")
+                {
+                    Sprite vanSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Characters/rescue_van.jpeg");
+                    if (vanSprite != null) _bodyRenderer.sprite = vanSprite;
+                }
+#endif
+                if (_bodyRenderer.sprite != null && _bodyRenderer.sprite.name.Contains("rescue_van"))
+                {
+                    _bodyRenderer.color = Color.white;
+                }
+                else
+                {
+                    _bodyRenderer.color = themeColor;
+                }
                 _bodyRenderer.sortingOrder = 8;
             }
 
