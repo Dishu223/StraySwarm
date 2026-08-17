@@ -6,7 +6,7 @@ namespace StraySwarm.Gameplay
 {
     /// <summary>
     /// Represents the rescue van that accepts a specific animal species (Puppy, Kitten, etc.).
-    /// Features a compact comic-style thought bubble displaying the target animal's face without obstructing the HUD.
+    /// Features a compact comic-style thought bubble displaying the target animal's face without scale distortion.
     /// </summary>
     public class VanController : MonoBehaviour
     {
@@ -37,6 +37,18 @@ namespace StraySwarm.Gameplay
             EnsureThoughtBubble();
         }
 
+        private void LateUpdate()
+        {
+            // Lock Thought Bubble to World Space top-right of the van with a gentle bob (immune to parent scale & rotation!)
+            if (_thoughtBubbleRoot != null)
+            {
+                float bob = Mathf.Sin(Time.time * 3.5f) * 0.04f;
+                _thoughtBubbleRoot.position = transform.position + new Vector3(0.55f, 0.48f + bob, 0f);
+                _thoughtBubbleRoot.rotation = Quaternion.identity;
+                _thoughtBubbleRoot.localScale = Vector3.one;
+            }
+        }
+
         private void EnsureThoughtBubble()
         {
             // Clean up old legacy cloud if present
@@ -45,71 +57,69 @@ namespace StraySwarm.Gameplay
 
             if (_thoughtBubbleRoot == null)
             {
-                Transform existing = transform.Find("MiniThoughtBubble");
-                if (existing != null)
-                {
-                    _thoughtBubbleRoot = existing;
-                    Transform iconChild = _thoughtBubbleRoot.Find("AnimalFaceIcon");
-                    if (iconChild != null) _targetAnimalIcon = iconChild.GetComponent<SpriteRenderer>();
-                }
-                else
-                {
-                    // 1. Root Thought Bubble anchored near top-right of van roof
-                    GameObject rootObj = new GameObject("MiniThoughtBubble");
-                    rootObj.transform.SetParent(transform, false);
-                    rootObj.transform.localPosition = new Vector3(0.42f, 0.48f, 0f);
-                    rootObj.transform.localScale = Vector3.one;
-                    _thoughtBubbleRoot = rootObj.transform;
+                // 1. Root Thought Bubble created in World Space
+                GameObject rootObj = new GameObject("MiniThoughtBubble");
+                rootObj.transform.position = transform.position + new Vector3(0.55f, 0.48f, 0f);
+                rootObj.transform.rotation = Quaternion.identity;
+                rootObj.transform.localScale = Vector3.one;
+                _thoughtBubbleRoot = rootObj.transform;
 
 #if UNITY_EDITOR
-                    Sprite bubbleSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Placeholders/RoundedCube.png");
-                    if (bubbleSprite == null) bubbleSprite = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
+                Sprite bubbleSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Placeholders/RoundedCube.png");
+                if (bubbleSprite == null) bubbleSprite = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
 #endif
 
-                    // 2. Trailing Small Dot 1
-                    GameObject dot1 = new GameObject("Dot1");
-                    dot1.transform.SetParent(_thoughtBubbleRoot, false);
-                    dot1.transform.localPosition = new Vector3(-0.25f, -0.22f, 0f);
-                    dot1.transform.localScale = new Vector3(0.10f, 0.10f, 1f);
-                    SpriteRenderer dot1Sr = dot1.AddComponent<SpriteRenderer>();
-                    dot1Sr.color = Color.white;
-                    dot1Sr.sortingOrder = 14;
+                // 2. Trailing Small Dot 1 (near van roof)
+                GameObject dot1 = new GameObject("Dot1");
+                dot1.transform.SetParent(_thoughtBubbleRoot, false);
+                dot1.transform.localPosition = new Vector3(-0.20f, -0.16f, 0f);
+                dot1.transform.localScale = new Vector3(0.08f, 0.08f, 1f);
+                SpriteRenderer dot1Sr = dot1.AddComponent<SpriteRenderer>();
+                dot1Sr.color = Color.white;
+                dot1Sr.sortingOrder = 14;
 #if UNITY_EDITOR
-                    if (bubbleSprite != null) dot1Sr.sprite = bubbleSprite;
+                if (bubbleSprite != null) dot1Sr.sprite = bubbleSprite;
 #endif
 
-                    // 3. Trailing Small Dot 2
-                    GameObject dot2 = new GameObject("Dot2");
-                    dot2.transform.SetParent(_thoughtBubbleRoot, false);
-                    dot2.transform.localPosition = new Vector3(-0.12f, -0.10f, 0f);
-                    dot2.transform.localScale = new Vector3(0.16f, 0.16f, 1f);
-                    SpriteRenderer dot2Sr = dot2.AddComponent<SpriteRenderer>();
-                    dot2Sr.color = Color.white;
-                    dot2Sr.sortingOrder = 14;
+                // 3. Trailing Small Dot 2 (mid)
+                GameObject dot2 = new GameObject("Dot2");
+                dot2.transform.SetParent(_thoughtBubbleRoot, false);
+                dot2.transform.localPosition = new Vector3(-0.10f, -0.08f, 0f);
+                dot2.transform.localScale = new Vector3(0.12f, 0.12f, 1f);
+                SpriteRenderer dot2Sr = dot2.AddComponent<SpriteRenderer>();
+                dot2Sr.color = Color.white;
+                dot2Sr.sortingOrder = 14;
 #if UNITY_EDITOR
-                    if (bubbleSprite != null) dot2Sr.sprite = bubbleSprite;
+                if (bubbleSprite != null) dot2Sr.sprite = bubbleSprite;
 #endif
 
-                    // 4. Main White Thought Bubble Pill
-                    GameObject mainBubble = new GameObject("MainBubble");
-                    mainBubble.transform.SetParent(_thoughtBubbleRoot, false);
-                    mainBubble.transform.localPosition = Vector3.zero;
-                    mainBubble.transform.localScale = new Vector3(0.62f, 0.50f, 1f);
-                    SpriteRenderer bubbleSr = mainBubble.AddComponent<SpriteRenderer>();
-                    bubbleSr.color = Color.white;
-                    bubbleSr.sortingOrder = 14;
+                // 4. Main White Thought Bubble Pill (Horizontal)
+                GameObject mainBubble = new GameObject("MainBubble");
+                mainBubble.transform.SetParent(_thoughtBubbleRoot, false);
+                mainBubble.transform.localPosition = Vector3.zero;
+                mainBubble.transform.localScale = new Vector3(0.55f, 0.42f, 1f);
+                SpriteRenderer bubbleSr = mainBubble.AddComponent<SpriteRenderer>();
+                bubbleSr.color = Color.white;
+                bubbleSr.sortingOrder = 14;
 #if UNITY_EDITOR
-                    if (bubbleSprite != null) bubbleSr.sprite = bubbleSprite;
+                if (bubbleSprite != null) bubbleSr.sprite = bubbleSprite;
 #endif
 
-                    // 5. Animal Face Photo Icon inside Main Bubble
-                    GameObject iconObj = new GameObject("AnimalFaceIcon");
-                    iconObj.transform.SetParent(_thoughtBubbleRoot, false);
-                    iconObj.transform.localPosition = new Vector3(0f, 0.01f, 0f);
-                    iconObj.transform.localScale = new Vector3(0.36f, 0.36f, 1f);
-                    _targetAnimalIcon = iconObj.AddComponent<SpriteRenderer>();
-                    _targetAnimalIcon.sortingOrder = 16;
-                }
+                // 5. Animal Face Photo Icon inside Main Bubble
+                GameObject iconObj = new GameObject("AnimalFaceIcon");
+                iconObj.transform.SetParent(_thoughtBubbleRoot, false);
+                iconObj.transform.localPosition = new Vector3(0f, 0.01f, 0f);
+                iconObj.transform.localScale = new Vector3(0.30f, 0.30f, 1f);
+                _targetAnimalIcon = iconObj.AddComponent<SpriteRenderer>();
+                _targetAnimalIcon.sortingOrder = 16;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (_thoughtBubbleRoot != null)
+            {
+                Destroy(_thoughtBubbleRoot.gameObject);
             }
         }
 
@@ -146,7 +156,8 @@ namespace StraySwarm.Gameplay
 #if UNITY_EDITOR
                 if (_bodyRenderer.sprite == null || _bodyRenderer.sprite.name == "RoundedCube" || _bodyRenderer.sprite.name == "Knob")
                 {
-                    Sprite vanSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Characters/rescue_van.jpeg");
+                    Sprite vanSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Characters/rescue_van.png");
+                    if (vanSprite == null) vanSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Characters/rescue_van.jpeg");
                     if (vanSprite != null) _bodyRenderer.sprite = vanSprite;
                 }
 #endif
@@ -210,23 +221,6 @@ namespace StraySwarm.Gameplay
                 if (iconSprite != null) _targetAnimalIcon.sprite = iconSprite;
                 _targetAnimalIcon.color = Color.white;
                 _targetAnimalIcon.sortingOrder = 16;
-            }
-
-            StopAllCoroutines();
-            StartCoroutine(ThoughtBobRoutine());
-        }
-
-        private IEnumerator ThoughtBobRoutine()
-        {
-            if (_thoughtBubbleRoot == null) yield break;
-            Vector3 baseLocalPos = new Vector3(0.48f, 0.42f, 0f);
-
-            while (true)
-            {
-                float bob = Mathf.Sin(Time.time * 3.5f) * 0.04f;
-                _thoughtBubbleRoot.localPosition = baseLocalPos + new Vector3(0f, bob, 0f);
-                _thoughtBubbleRoot.rotation = Quaternion.identity; // Keeps thought bubble & animal photo upright!
-                yield return null;
             }
         }
 
@@ -307,8 +301,8 @@ namespace StraySwarm.Gameplay
         {
             float elapsed = 0f;
             float duration = 0.1f;
-            Vector3 originalScale = new Vector3(1.5f, 1f, 1f);
-            Vector3 squishedScale = new Vector3(originalScale.x * 1.15f, originalScale.y * 0.85f, originalScale.z);
+            Vector3 originalScale = new Vector3(1.6f, 1.1f, 1f);
+            Vector3 squishedScale = new Vector3(originalScale.x * 1.12f, originalScale.y * 0.88f, originalScale.z);
 
             // 1. Squash down
             while (elapsed < duration)
