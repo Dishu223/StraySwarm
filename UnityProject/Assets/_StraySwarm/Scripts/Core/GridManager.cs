@@ -77,7 +77,54 @@ namespace StraySwarm.Core
             // 2. Connect the nodes so the cat knows where it can walk
             ConnectNodes();
 
+            // 3. Dynamically center and scale the camera to fit any level size comfortably!
+            AutoFrameCamera();
+
             Debug.Log($"[GridManager] Scanned Tilemap and built graph with {_gridGraph.Count} nodes.");
+        }
+
+        /// <summary>
+        /// Automatically centers and zooms the Main Camera to frame any level layout with proper HUD padding.
+        /// </summary>
+        public void AutoFrameCamera()
+        {
+            Camera cam = Camera.main;
+            if (cam == null || _gridGraph.Count == 0) return;
+
+            float minX = float.MaxValue, maxX = float.MinValue;
+            float minY = float.MaxValue, maxY = float.MinValue;
+
+            foreach (var kvp in _gridGraph)
+            {
+                Vector3 pos = kvp.Value.WorldPosition;
+                if (pos.x < minX) minX = pos.x;
+                if (pos.x > maxX) maxX = pos.x;
+                if (pos.y < minY) minY = pos.y;
+                if (pos.y > maxY) maxY = pos.y;
+            }
+
+            // Include any rescue stations on the map
+            var stations = Object.FindObjectsByType<Gameplay.RescueStation>(FindObjectsInactive.Exclude);
+            foreach (var st in stations)
+            {
+                Vector3 pos = st.transform.position;
+                if (pos.x < minX) minX = pos.x;
+                if (pos.x > maxX) maxX = pos.x;
+                if (pos.y < minY) minY = pos.y;
+                if (pos.y > maxY) maxY = pos.y;
+            }
+
+            float centerX = (minX + maxX) * 0.5f;
+            float centerY = (minY + maxY) * 0.5f;
+
+            // Extra top padding for the Top HUD and Timer
+            float width = (maxX - minX) + 2.2f;
+            float height = (maxY - minY) + 3.8f;
+
+            cam.transform.position = new Vector3(centerX, centerY - 0.4f, -10f);
+
+            float targetOrtho = Mathf.Max(height * 0.5f, (width / cam.aspect) * 0.5f);
+            cam.orthographicSize = Mathf.Clamp(targetOrtho, 5.5f, 20f);
         }
 
         /// <summary>

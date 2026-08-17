@@ -51,13 +51,13 @@ namespace StraySwarm.Editor
                 if (spriteMat != null) sr.material = spriteMat;
                 sr.sortingOrder = 5;
 
-                // Scale (0.55 on x,y for compact, adorable conga-line followers)
-                go.transform.localScale = new Vector3(0.55f, 0.55f, 1f);
+                // Scale (0.42 on x,y for compact, adorable kawaii conga-line followers)
+                go.transform.localScale = new Vector3(0.42f, 0.42f, 1f);
 
-                // Circle Collider 2D (Compact 0.3f radius for precise single-tile collection)
+                // Circle Collider 2D (Compact 0.28f radius for precise single-tile collection)
                 CircleCollider2D col = go.AddComponent<CircleCollider2D>();
                 col.isTrigger = true;
-                col.radius = 0.3f;
+                col.radius = 0.28f;
 
                 // Follower Behavior
                 FollowerBehavior follower = go.AddComponent<FollowerBehavior>();

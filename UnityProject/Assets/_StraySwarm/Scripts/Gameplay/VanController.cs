@@ -6,7 +6,7 @@ namespace StraySwarm.Gameplay
 {
     /// <summary>
     /// Represents the rescue van that accepts a specific animal species (Puppy, Kitten, etc.).
-    /// Features a floating white cloud thought bubble displaying the target animal's face.
+    /// Features a compact comic-style thought bubble displaying the target animal's face without obstructing the HUD.
     /// </summary>
     public class VanController : MonoBehaviour
     {
@@ -16,7 +16,7 @@ namespace StraySwarm.Gameplay
 
         [Header("Visual Feedback")]
         [SerializeField] private SpriteRenderer _bodyRenderer;
-        [SerializeField] private Transform _cloudBubble;
+        [SerializeField] private Transform _thoughtBubbleRoot;
         [SerializeField] private SpriteRenderer _targetAnimalIcon;
         
         public bool IsFull => _currentLoad >= Capacity;
@@ -29,55 +29,79 @@ namespace StraySwarm.Gameplay
         {
             if (_bodyRenderer == null) _bodyRenderer = GetComponent<SpriteRenderer>();
             if (_bodyRenderer != null) _bodyRenderer.sortingOrder = 8;
-            EnsureCloudBubble();
+            EnsureThoughtBubble();
         }
 
-        private void EnsureCloudBubble()
+        private void EnsureThoughtBubble()
         {
-            if (_cloudBubble == null)
+            // Clean up old legacy cloud if present
+            Transform oldCloud = transform.Find("CloudThoughtBubble");
+            if (oldCloud != null) DestroyImmediate(oldCloud.gameObject);
+
+            if (_thoughtBubbleRoot == null)
             {
-                Transform existingCloud = transform.Find("CloudThoughtBubble");
-                if (existingCloud != null)
+                Transform existing = transform.Find("MiniThoughtBubble");
+                if (existing != null)
                 {
-                    _cloudBubble = existingCloud;
-                    Transform iconChild = _cloudBubble.Find("AnimalFaceIcon");
+                    _thoughtBubbleRoot = existing;
+                    Transform iconChild = _thoughtBubbleRoot.Find("AnimalFaceIcon");
                     if (iconChild != null) _targetAnimalIcon = iconChild.GetComponent<SpriteRenderer>();
                 }
                 else
                 {
-                    // 1. Root Cloud Bubble
-                    GameObject cloudObj = new GameObject("CloudThoughtBubble");
-                    cloudObj.transform.SetParent(transform, false);
-                    cloudObj.transform.localPosition = new Vector3(0f, 1.15f, 0f);
-                    cloudObj.transform.localScale = Vector3.one;
-                    _cloudBubble = cloudObj.transform;
-
-                    // 2. White Cloud Background Pill
-                    SpriteRenderer cloudBg = cloudObj.AddComponent<SpriteRenderer>();
-                    cloudBg.color = Color.white;
-                    cloudBg.sortingOrder = 13;
+                    // 1. Root Thought Bubble anchored near top-right of van roof
+                    GameObject rootObj = new GameObject("MiniThoughtBubble");
+                    rootObj.transform.SetParent(transform, false);
+                    rootObj.transform.localPosition = new Vector3(0.42f, 0.48f, 0f);
+                    rootObj.transform.localScale = Vector3.one;
+                    _thoughtBubbleRoot = rootObj.transform;
 
 #if UNITY_EDITOR
-                    Sprite whiteBubble = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Placeholders/RoundedCube.png");
-                    if (whiteBubble == null) whiteBubble = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
-                    if (whiteBubble != null) cloudBg.sprite = whiteBubble;
+                    Sprite bubbleSprite = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>("Assets/_StraySwarm/Art/Placeholders/RoundedCube.png");
+                    if (bubbleSprite == null) bubbleSprite = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
 #endif
 
-                    // 3. Small Tail Dot connecting cloud to van
-                    GameObject dotObj = new GameObject("CloudTailDot");
-                    dotObj.transform.SetParent(cloudObj.transform, false);
-                    dotObj.transform.localPosition = new Vector3(0f, -0.45f, 0f);
-                    dotObj.transform.localScale = new Vector3(0.25f, 0.25f, 1f);
-                    SpriteRenderer dotSr = dotObj.AddComponent<SpriteRenderer>();
-                    dotSr.color = Color.white;
-                    dotSr.sortingOrder = 13;
-                    if (cloudBg.sprite != null) dotSr.sprite = cloudBg.sprite;
+                    // 2. Trailing Small Dot 1
+                    GameObject dot1 = new GameObject("Dot1");
+                    dot1.transform.SetParent(_thoughtBubbleRoot, false);
+                    dot1.transform.localPosition = new Vector3(-0.25f, -0.22f, 0f);
+                    dot1.transform.localScale = new Vector3(0.10f, 0.10f, 1f);
+                    SpriteRenderer dot1Sr = dot1.AddComponent<SpriteRenderer>();
+                    dot1Sr.color = Color.white;
+                    dot1Sr.sortingOrder = 14;
+#if UNITY_EDITOR
+                    if (bubbleSprite != null) dot1Sr.sprite = bubbleSprite;
+#endif
 
-                    // 4. Animal Face Icon inside the Cloud
+                    // 3. Trailing Small Dot 2
+                    GameObject dot2 = new GameObject("Dot2");
+                    dot2.transform.SetParent(_thoughtBubbleRoot, false);
+                    dot2.transform.localPosition = new Vector3(-0.12f, -0.10f, 0f);
+                    dot2.transform.localScale = new Vector3(0.16f, 0.16f, 1f);
+                    SpriteRenderer dot2Sr = dot2.AddComponent<SpriteRenderer>();
+                    dot2Sr.color = Color.white;
+                    dot2Sr.sortingOrder = 14;
+#if UNITY_EDITOR
+                    if (bubbleSprite != null) dot2Sr.sprite = bubbleSprite;
+#endif
+
+                    // 4. Main White Thought Bubble Pill
+                    GameObject mainBubble = new GameObject("MainBubble");
+                    mainBubble.transform.SetParent(_thoughtBubbleRoot, false);
+                    mainBubble.transform.localPosition = Vector3.zero;
+                    mainBubble.transform.localScale = new Vector3(0.62f, 0.50f, 1f);
+                    SpriteRenderer bubbleSr = mainBubble.AddComponent<SpriteRenderer>();
+                    bubbleSr.color = Color.white;
+                    bubbleSr.sortingOrder = 14;
+#if UNITY_EDITOR
+                    if (bubbleSprite != null) bubbleSr.sprite = bubbleSprite;
+#endif
+
+                    // 5. Animal Face Photo Icon inside Main Bubble
                     GameObject iconObj = new GameObject("AnimalFaceIcon");
-                    iconObj.transform.SetParent(cloudObj.transform, false);
-                    iconObj.transform.localPosition = new Vector3(0f, 0.02f, 0f);
-                    iconObj.transform.localScale = new Vector3(0.6f, 0.6f, 1f);
+                    iconObj.transform.SetParent(_thoughtBubbleRoot, false);
+                    iconObj.transform.localPosition = new Vector3(0f, 0.01f, 0f);
+                    iconObj.transform.localScale = new Vector3(0.36f, 0.36f, 1f);
                     _targetAnimalIcon = iconObj.AddComponent<SpriteRenderer>();
                     _targetAnimalIcon.sortingOrder = 16;
                 }
@@ -97,7 +121,7 @@ namespace StraySwarm.Gameplay
 
         private void ApplySpeciesTheme(AnimalType type, Sprite customIcon = null)
         {
-            EnsureCloudBubble();
+            EnsureThoughtBubble();
 
             // 1. Set Body Color matching Kawaii species theme
             Color themeColor;
@@ -118,21 +142,40 @@ namespace StraySwarm.Gameplay
                 _bodyRenderer.sortingOrder = 8;
             }
 
-            // 2. Resolve Species Icon Sprite
+            // 2. Resolve Exact Animal WorldSprite from AnimalData
             Sprite iconSprite = customIcon;
             if (iconSprite == null)
             {
 #if UNITY_EDITOR
-                string assetName = type.ToString();
-                string[] guids = UnityEditor.AssetDatabase.FindAssets($"Animal_{assetName} t:GameObject");
-                if (guids.Length > 0)
+                string assetName = "";
+                switch (type)
                 {
-                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
-                    GameObject prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                    if (prefab != null)
+                    case AnimalType.Puppy:  assetName = "BluePuppy"; break;
+                    case AnimalType.Kitten: assetName = "PinkKitten"; break;
+                    case AnimalType.Frog:   assetName = "GreenFrog"; break;
+                    case AnimalType.Mouse:  assetName = "OrangeHamster"; break;
+                    case AnimalType.Pigeon: assetName = "YellowPigeon"; break;
+                    case AnimalType.Bunny:  assetName = "PurpleBunny"; break;
+                }
+
+                AnimalData aData = UnityEditor.AssetDatabase.LoadAssetAtPath<AnimalData>($"Assets/_StraySwarm/Data/Animals/{assetName}.asset");
+                if (aData != null && aData.WorldSprite != null)
+                {
+                    iconSprite = aData.WorldSprite;
+                }
+
+                if (iconSprite == null)
+                {
+                    string[] guids = UnityEditor.AssetDatabase.FindAssets($"Animal_{type} t:GameObject");
+                    if (guids.Length > 0)
                     {
-                        var sr = prefab.GetComponent<SpriteRenderer>();
-                        if (sr != null) iconSprite = sr.sprite;
+                        string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+                        GameObject prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                        if (prefab != null)
+                        {
+                            var sr = prefab.GetComponent<SpriteRenderer>();
+                            if (sr != null) iconSprite = sr.sprite;
+                        }
                     }
                 }
 
@@ -151,18 +194,18 @@ namespace StraySwarm.Gameplay
             }
 
             StopAllCoroutines();
-            StartCoroutine(CloudBobRoutine());
+            StartCoroutine(ThoughtBobRoutine());
         }
 
-        private IEnumerator CloudBobRoutine()
+        private IEnumerator ThoughtBobRoutine()
         {
-            if (_cloudBubble == null) yield break;
-            Vector3 baseLocalPos = new Vector3(0f, 1.15f, 0f);
+            if (_thoughtBubbleRoot == null) yield break;
+            Vector3 baseLocalPos = new Vector3(0.42f, 0.48f, 0f);
 
             while (true)
             {
-                float bob = Mathf.Sin(Time.time * 3.5f) * 0.08f;
-                _cloudBubble.localPosition = baseLocalPos + new Vector3(0f, bob, 0f);
+                float bob = Mathf.Sin(Time.time * 3.5f) * 0.04f;
+                _thoughtBubbleRoot.localPosition = baseLocalPos + new Vector3(0f, bob, 0f);
                 yield return null;
             }
         }
